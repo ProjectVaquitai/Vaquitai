@@ -214,46 +214,46 @@ def unify_format(
     logger.info(f'{len(dataset)} samples left after filtering empty text.')
 
     # 3. convert relative paths to absolute paths
-    if global_cfg:
-        ds_dir = global_cfg.dataset_dir
-        image_key = global_cfg.image_key
+    # if global_cfg:
+    #     ds_dir = global_cfg.dataset_dir
+    #     image_key = global_cfg.image_key
 
-        if image_key not in dataset.features:
-            # no image path list in dataset, no need to convert
-            return dataset
+    #     if image_key not in dataset.features:
+    #         # no image path list in dataset, no need to convert
+    #         return dataset
 
-        logger.info('Converting relative paths in the dataset to their '
-                    'absolute version. (Based on the directory of input '
-                    'dataset file)')
+    #     logger.info('Converting relative paths in the dataset to their '
+    #                 'absolute version. (Based on the directory of input '
+    #                 'dataset file)')
 
-        # function to convert relative paths to absolute paths
-        def rel2abs(sample, path_keys, dataset_dir):
-            for path_key in path_keys:
-                if path_key not in sample:
-                    continue
-                paths = sample[path_key]
-                if not paths:
-                    continue
-                new_paths = [
-                    os.path.join(dataset_dir, path) for path in paths
-                    if not os.path.isabs(path)
-                ]
-                sample[path_key] = new_paths
-            return sample
+    #     # function to convert relative paths to absolute paths
+    #     def rel2abs(sample, path_keys, dataset_dir):
+    #         for path_key in path_keys:
+    #             if path_key not in sample:
+    #                 continue
+    #             paths = sample[path_key]
+    #             if not paths:
+    #                 continue
+    #             new_paths = [
+    #                 os.path.join(dataset_dir, path) for path in paths
+    #                 if not os.path.isabs(path)
+    #             ]
+    #             sample[path_key] = new_paths
+    #         return sample
 
-        dataset = dataset.map(rel2abs,
-                              num_proc=num_proc,
-                              fn_kwargs={
-                                  'path_keys': [
-                                      image_key,
-                                  ],
-                                  'dataset_dir': ds_dir
-                              })
-    else:
-        logger.warning('No global config passed into unify_format function. '
-                       'Relative paths in the dataset might not be converted '
-                       'to their absolute versions. Data of other modalities '
-                       'might not be able to find by Data-Juicer.')
+    #     dataset = dataset.map(rel2abs,
+    #                           num_proc=num_proc,
+    #                           fn_kwargs={
+    #                               'path_keys': [
+    #                                   image_key,
+    #                               ],
+    #                               'dataset_dir': ds_dir
+    #                           })
+    # else:
+    #     logger.warning('No global config passed into unify_format function. '
+    #                    'Relative paths in the dataset might not be converted '
+    #                    'to their absolute versions. Data of other modalities '
+    #                    'might not be able to find by Data-Juicer.')
 
     return dataset
 
