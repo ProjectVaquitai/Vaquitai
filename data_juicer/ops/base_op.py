@@ -174,3 +174,32 @@ class Selector(OP):
         :return: selected dataset.
         """
         raise NotImplementedError
+
+class Generator(OP):
+
+    def __init__(
+        self,
+        text_key: str = None,
+        image_key: str = None,
+    ):
+        """
+        Base class that conducts generation.
+        :param text_key: the key name of field that stores sample texts
+            to be processed
+        :param image_key: the key name of field that stores sample image list
+            to be processed
+        """
+        super(Generator, self).__init__(text_key, image_key)
+
+        from data_juicer.core.data import wrap_func_with_nested_access
+        self.process = wrap_func_with_nested_access(self.process)
+
+    
+    def process(self, dataset):
+        """
+        Dataset --> dataset.
+
+        :param dataset: input dataset
+        :return: dataset with generated contents.
+        """
+        raise NotImplementedError

@@ -187,73 +187,73 @@ def unify_format(
     dataset = NestedDataset(dataset)
 
     # 1. check text related keys
-    for key in text_keys:
-        if key not in dataset.features:
-            err_msg = f'There is no key [{key}] in dataset. You might set ' \
-                      f'wrong text_key in the config file for your dataset. ' \
-                      f'Please check and retry!'
-            logger.error(err_msg)
-            raise ValueError(err_msg)
+    # for key in text_keys:
+    #     if key not in dataset.features:
+    #         err_msg = f'There is no key [{key}] in dataset. You might set ' \
+    #                   f'wrong text_key in the config file for your dataset. ' \
+    #                   f'Please check and retry!'
+    #         logger.error(err_msg)
+    #         raise ValueError(err_msg)
 
     # 2. filter out those samples with empty or None text
     # TODO: optimize the filtering operation for better efficiency
-    logger.info(f'There are {len(dataset)} sample(s) in the original dataset.')
+    # logger.info(f'There are {len(dataset)} sample(s) in the original dataset.')
 
-    def non_empty_text(sample, target_keys):
-        for target_key in target_keys:
-            # TODO: case for CFT, in which the len(sample[target_key]) == 0
-            if sample[target_key] is None:
-                # we filter out the samples contains at least None column
-                # since the op can not handle it now
-                return False
-        return True
+    # def non_empty_text(sample, target_keys):
+    #     for target_key in target_keys:
+    #         # TODO: case for CFT, in which the len(sample[target_key]) == 0
+    #         if sample[target_key] is None:
+    #             # we filter out the samples contains at least None column
+    #             # since the op can not handle it now
+    #             return False
+    #     return True
 
-    dataset = dataset.filter(non_empty_text,
-                             num_proc=num_proc,
-                             fn_kwargs={'target_keys': text_keys})
-    logger.info(f'{len(dataset)} samples left after filtering empty text.')
+    # dataset = dataset.filter(non_empty_text,
+    #                          num_proc=num_proc,
+    #                          fn_kwargs={'target_keys': text_keys})
+    # logger.info(f'{len(dataset)} samples left after filtering empty text.')
 
     # 3. convert relative paths to absolute paths
-    if global_cfg:
-        ds_dir = global_cfg.dataset_dir
-        image_key = global_cfg.image_key
+    # if global_cfg:
+    #     ds_dir = global_cfg.dataset_dir
+    #     image_key = global_cfg.image_key
 
-        if image_key not in dataset.features:
-            # no image path list in dataset, no need to convert
-            return dataset
+    #     if image_key not in dataset.features:
+    #         # no image path list in dataset, no need to convert
+    #         return dataset
 
-        logger.info('Converting relative paths in the dataset to their '
-                    'absolute version. (Based on the directory of input '
-                    'dataset file)')
+    #     logger.info('Converting relative paths in the dataset to their '
+    #                 'absolute version. (Based on the directory of input '
+    #                 'dataset file)')
 
-        # function to convert relative paths to absolute paths
-        def rel2abs(sample, path_keys, dataset_dir):
-            for path_key in path_keys:
-                if path_key not in sample:
-                    continue
-                paths = sample[path_key]
-                if not paths:
-                    continue
-                new_paths = [
-                    os.path.join(dataset_dir, path) for path in paths
-                    if not os.path.isabs(path)
-                ]
-                sample[path_key] = new_paths
-            return sample
+    #     # function to convert relative paths to absolute paths
+    #     def rel2abs(sample, path_keys, dataset_dir):
+    #         for path_key in path_keys:
+    #             if path_key not in sample:
+    #                 continue
+    #             paths = sample[path_key]
+    #             if not paths:
+    #                 continue
+    #             new_paths = [
+    #                 os.path.join(dataset_dir, path) for path in paths
+    #                 if not os.path.isabs(path)
+    #             ]
+    #             sample[path_key] = new_paths
+    #         return sample
 
-        dataset = dataset.map(rel2abs,
-                              num_proc=num_proc,
-                              fn_kwargs={
-                                  'path_keys': [
-                                      image_key,
-                                  ],
-                                  'dataset_dir': ds_dir
-                              })
-    else:
-        logger.warning('No global config passed into unify_format function. '
-                       'Relative paths in the dataset might not be converted '
-                       'to their absolute versions. Data of other modalities '
-                       'might not be able to find by Data-Juicer.')
+    #     dataset = dataset.map(rel2abs,
+    #                           num_proc=num_proc,
+    #                           fn_kwargs={
+    #                               'path_keys': [
+    #                                   image_key,
+    #                               ],
+    #                               'dataset_dir': ds_dir
+    #                           })
+    # else:
+    #     logger.warning('No global config passed into unify_format function. '
+    #                    'Relative paths in the dataset might not be converted '
+    #                    'to their absolute versions. Data of other modalities '
+    #                    'might not be able to find by Data-Juicer.')
 
     return dataset
 

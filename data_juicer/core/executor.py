@@ -6,7 +6,7 @@ from loguru import logger
 from data_juicer.config import init_configs
 from data_juicer.format.load import load_formatter
 from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
-                             load_ops)
+                             Generator, load_ops)
 from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
 from data_juicer.utils.constant import Fields
@@ -116,7 +116,12 @@ class Executor:
             op_name, op_args = list(op_cfg.items())[0]
             prev = dataset  # record last dataset
             try:
-                if isinstance(op, Mapper):
+                if isinstance(op, Generator):   
+                    if self.cfg.use_checkpoint:
+                        prev = dataset
+                    tmp = op.process(dataset)
+
+                elif isinstance(op, Mapper):
                     tmp = dataset.map(function=op.process,
                                       num_proc=self.cfg.np,
                                       desc=op_name + '_process')

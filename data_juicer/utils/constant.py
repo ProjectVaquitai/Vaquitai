@@ -49,6 +49,14 @@ class HashKeys(object):
     # image
     imagehash = DEFAULT_PREFIX + 'imagehash'
 
+class EmbKeys(object):
+    image_embedding = DEFAULT_PREFIX + 'image_embedding'
+    text_embedding = DEFAULT_PREFIX + 'text_embedding'
+    image_embedding_2d = DEFAULT_PREFIX + 'image_embedding_2d'
+    text_embedding_2d = DEFAULT_PREFIX + 'text_embedding_2d'
+
+class GenKeys(object):
+    image_caption = DEFAULT_PREFIX + 'image_caption'
 
 class InterVars(object):
     # text

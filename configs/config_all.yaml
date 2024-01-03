@@ -241,3 +241,8 @@ process:
       top_ratio:                                              # ratio of selected top specified field value
       topk:                                                   # number of selected top specified field value
       reverse: True                                           # determine the sorting rule, if reverse=True, then sort in descending order
+  
+  # Generator ops
+  - image_feature_extract_generator:                                # extract embeddings for images 
+  - image_caption_generator:
+  - feature_reduce_generator:     
