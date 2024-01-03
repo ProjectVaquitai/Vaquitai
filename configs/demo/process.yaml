@@ -12,3 +12,5 @@ export_path: './outputs/demo-process/demo-processed.jsonl'
 process:
   - language_id_score_filter:
       lang: 'zh'
+  - document_deduplicator:
+      lowercase: True
