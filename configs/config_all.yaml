@@ -231,9 +231,8 @@ process:
       hamming_distance: 4                                     # the max hamming distance to regard 2 samples as similar enough pair. Should be less than num_blocks always
       lowercase: true                                         # whether to convert text to lower case
       ignore_pattern: null                                    # whether to ignore sub-strings with specific pattern when computing simhash.
-  - image_deduplicator:                                     # deduplicator to deduplicate samples at document-level using exact matching of images between documents.
+  - image_deduplicator:                                     # deduplicator to deduplicate samples at image-level
       method: phash                                           # hash method for image. One of [phash, dhash, whash, ahash]
-
   # Selector ops
   - topk_specified_field_selector:                          # selector to select top samples based on the sorted specified field
       field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'

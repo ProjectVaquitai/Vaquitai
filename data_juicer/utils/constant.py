@@ -142,6 +142,9 @@ class HashKeys(object):
 
     # image
     imagehash = DEFAULT_PREFIX + 'imagehash'
+    
+class CleaningKeys(object):
+    duplicated = DEFAULT_PREFIX + 'duplicated'
 
 
 class InterVars(object):

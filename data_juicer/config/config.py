@@ -128,7 +128,7 @@ def init_configs(args=None):
     parser.add_argument(
         '--image_key',
         type=str,
-        default='images',
+        default='image',
         help='Key name of field to store the list of sample image paths.')
     parser.add_argument(
         '--image_special_token',
