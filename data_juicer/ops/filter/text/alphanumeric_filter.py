@@ -6,8 +6,8 @@ from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Filter
-from ..common import get_words_from_document
+from ...base_op import OPERATORS, Filter
+from ...common import get_words_from_document
 
 OP_NAME = 'alphanumeric_filter'
 

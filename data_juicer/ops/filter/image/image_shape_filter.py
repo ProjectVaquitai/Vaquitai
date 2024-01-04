@@ -6,8 +6,8 @@ from jsonargparse.typing import PositiveInt
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import load_image
 
-from ..base_op import OPERATORS, Filter
-from ..op_fusion import LOADED_IMAGES
+from ...base_op import OPERATORS, Filter
+from ...op_fusion import LOADED_IMAGES
 
 
 @OPERATORS.register_module('image_shape_filter')

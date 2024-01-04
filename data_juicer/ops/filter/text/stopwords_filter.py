@@ -4,17 +4,17 @@
 
 from jsonargparse.typing import ClosedUnitInterval, List
 
+from data_juicer.utils.asset_utils import ASSET_DIR, load_words_asset
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ...utils.asset_utils import ASSET_DIR, load_words_asset
-from ..base_op import OPERATORS, Filter
+from ...base_op import OPERATORS, Filter
 from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       words_refinement)
-from ..op_fusion import INTER_WORDS
+from ...op_fusion import INTER_WORDS
 
-OP_NAME = 'flagged_words_filter'
+OP_NAME = 'stopwords_filter'
 
 with AvailabilityChecking(['sentencepiece'], OP_NAME):
     import sentencepiece  # noqa: F401
@@ -22,15 +22,15 @@ with AvailabilityChecking(['sentencepiece'], OP_NAME):
 
 @OPERATORS.register_module(OP_NAME)
 @INTER_WORDS.register_module(OP_NAME)
-class FlaggedWordFilter(Filter):
-    """Filter to keep samples with flagged-word ratio less than a specific max
+class StopWordsFilter(Filter):
+    """Filter to keep samples with stopword ratio larger than a specific min
     value."""
 
     def __init__(self,
                  lang: str = 'en',
                  tokenization: bool = False,
-                 max_ratio: ClosedUnitInterval = 0.045,
-                 flagged_words_dir: str = ASSET_DIR,
+                 min_ratio: ClosedUnitInterval = 0.3,
+                 stopwords_dir: str = ASSET_DIR,
                  use_words_aug: bool = False,
                  words_aug_group_sizes: List = [2],
                  words_aug_join_char: str = '',
@@ -39,14 +39,13 @@ class FlaggedWordFilter(Filter):
         """
         Initialization method.
 
-        :param lang: Consider flagged words in what language. If lang ==
+        :param lang: Consider stopwords in what language. If lang ==
             "all", we will adopt the one merged from all the available
             languages
-        :param tokenization: Whether to use model to tokenize documents
-        :param max_ratio: The max filter ratio in this op.
-        :param flagged_words_dir: The directory storing the
-            flagged_words file(s) whose name includes "flagged_words"
-            and in json format
+        :param tokenization: whether to use model to tokenize documents
+        :param min_ratio: The min filter ratio in this op.
+        :param stopwords_dir: The directory storing the stopwords
+            file(s) whose name includes "stopwords" and in json format
         :param use_words_aug: Whether to augment words, especially for
             Chinese and Vietnamese
         :param words_aug_group_sizes: The group size of words to augment
@@ -57,18 +56,18 @@ class FlaggedWordFilter(Filter):
         """
         super().__init__(*args, **kwargs)
         self.lang = lang
-        self.max_ratio = max_ratio
+        self.min_ratio = min_ratio
         self.use_words_aug = use_words_aug
         self.words_aug_group_sizes = words_aug_group_sizes
         self.words_aug_join_char = words_aug_join_char
         self.model_key = None
+        self.lang = lang
 
-        self.FLAGGED_WORDS = load_words_asset(words_dir=flagged_words_dir,
-                                              words_type='flagged_words')
-
-        if 'all' not in self.FLAGGED_WORDS:
-            self.FLAGGED_WORDS['all'] = [
-                val for vals in self.FLAGGED_WORDS.values() for val in vals
+        self.STOPWORDS = load_words_asset(words_dir=stopwords_dir,
+                                          words_type='stopwords')
+        if 'all' not in self.STOPWORDS:
+            self.STOPWORDS['all'] = [
+                val for vals in self.STOPWORDS.values() for val in vals
             ]
         if tokenization:
             self.model_key = prepare_model(lang=lang,
@@ -76,7 +75,7 @@ class FlaggedWordFilter(Filter):
 
     def compute_stats(self, sample, context=False):
         # check if it's computed already
-        if StatsKeys.flagged_words_ratio in sample[Fields.stats]:
+        if StatsKeys.stopwords_ratio in sample[Fields.stats]:
             return sample
 
         # try to get words from context
@@ -111,18 +110,18 @@ class FlaggedWordFilter(Filter):
             if context:
                 sample[Fields.context][refined_words_key] = words
 
-        flagged_words_ratio = (len(
-            [word
-             for word in words if word in self.FLAGGED_WORDS[self.lang]]) /
-                               len(words)) if len(words) != 0 else 0.0
+        stopwords_ratio = (
+                len([word for word in words
+                     if word in self.STOPWORDS[self.lang]])
+                / len(words)) \
+            if len(words) != 0 else 0.0
 
-        if flagged_words_ratio > 1.0:
-            flagged_words_ratio = 1.0
+        if stopwords_ratio > 1.0:
+            stopwords_ratio = 1.0
 
-        sample[Fields.stats][
-            StatsKeys.flagged_words_ratio] = flagged_words_ratio
+        sample[Fields.stats][StatsKeys.stopwords_ratio] = stopwords_ratio
         return sample
 
     def process(self, sample):
         return sample[Fields.stats][
-            StatsKeys.flagged_words_ratio] <= self.max_ratio
+            StatsKeys.stopwords_ratio] >= self.min_ratio

@@ -4,8 +4,8 @@ from jsonargparse.typing import PositiveInt
 
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 
-from ..base_op import OPERATORS, Filter
-from ..op_fusion import INTER_LINES
+from ...base_op import OPERATORS, Filter
+from ...op_fusion import INTER_LINES
 
 
 @OPERATORS.register_module('average_line_length_filter')

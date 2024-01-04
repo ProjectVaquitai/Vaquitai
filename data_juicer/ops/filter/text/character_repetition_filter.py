@@ -7,7 +7,7 @@ from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
 
-from ..base_op import OPERATORS, Filter
+from ...base_op import OPERATORS, Filter
 
 
 @OPERATORS.register_module('character_repetition_filter')

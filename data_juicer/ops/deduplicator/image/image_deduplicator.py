@@ -7,8 +7,8 @@ from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, HashKeys, CleaningKeys
 from data_juicer.utils.mm_utils import load_image
 
-from ..base_op import OPERATORS, Deduplicator
-from ..op_fusion import LOADED_IMAGES
+from ...base_op import OPERATORS, Deduplicator
+from ...op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_deduplicator'
 
@@ -120,6 +120,7 @@ class ImageDeduplicator(Deduplicator):
             ][:show_num])
         
         def _map_dup_helper(sample, hashes):
+            ##### exact match #####
             hash = sample[HashKeys.imagehash]
             if not hash:
                 return sample
@@ -128,11 +129,11 @@ class ImageDeduplicator(Deduplicator):
                 # tracer is open and not enough duplicate sample pairs
                 dup_pairs[hash].append(sample)
             if hash in hashes:
-                sample[CleaningKeys.duplicated] = True
+                sample[CleaningKeys.image_duplicated] = True
                 return sample
             else:
                 hashes.add(hash)
-                sample[CleaningKeys.duplicated] = False
+                sample[CleaningKeys.image_duplicated] = False
                 return sample
 
         # def _filter_dup_helper(sample, hashes):
@@ -144,11 +145,9 @@ class ImageDeduplicator(Deduplicator):
         #         # tracer is open and not enough duplicate sample pairs
         #         dup_pairs[hash].append(sample)
         #     if hash in hashes:
-        #         sample[CleaningKeys.duplicated] = True
         #         return False
         #     else:
         #         hashes.add(hash)
-        #         sample[CleaningKeys.duplicated] = False
         #         return True
 
         hashes = set()

@@ -3,7 +3,7 @@ import numpy as np
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import get_image_size, size_to_bytes
 
-from ..base_op import OPERATORS, Filter
+from ...base_op import OPERATORS, Filter
 
 
 @OPERATORS.register_module('image_size_filter')

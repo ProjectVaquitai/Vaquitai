@@ -111,6 +111,13 @@ def init_configs(args=None):
         help='Whether to keep the computed hashes in the result dataset. If '
         'it\'s False, the intermediate fields to store the hashes '
         'computed by Deduplicators will be removed. Default: False.')
+    parser.add_argument(
+        '--keep_cleaning_stas_in_res_ds',
+        type=bool,
+        default=False,
+        help='Whether to keep the computed cleaning stas in the result dataset. If '
+        'it\'s False, the intermediate fields to store the cleaning stas '
+        'will be removed. Default: False.')
     parser.add_argument('--np',
                         type=PositiveInt,
                         default=4,

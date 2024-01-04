@@ -15,8 +15,8 @@ from tqdm import tqdm
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
 
-from ..base_op import OPERATORS, Deduplicator
-from ..common.helper_func import UnionFind, split_on_whitespace
+from ...base_op import OPERATORS, Deduplicator
+from ...common.helper_func import UnionFind, split_on_whitespace
 
 OP_NAME = 'document_minhash_deduplicator'
 

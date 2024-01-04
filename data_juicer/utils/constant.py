@@ -143,8 +143,14 @@ class HashKeys(object):
     # image
     imagehash = DEFAULT_PREFIX + 'imagehash'
     
+    
 class CleaningKeys(object):
-    duplicated = DEFAULT_PREFIX + 'duplicated'
+    # image
+    image_duplicated = DEFAULT_PREFIX + 'duplicated'
+    brightness = DEFAULT_PREFIX + 'brightness'
+    brightness_label = DEFAULT_PREFIX + 'brightness_label'
+    blurriness = DEFAULT_PREFIX + 'blurriness'
+    blurriness_label = DEFAULT_PREFIX + 'blurriness_label'
 
 
 class InterVars(object):

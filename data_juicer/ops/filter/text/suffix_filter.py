@@ -2,7 +2,7 @@ from typing import List, Tuple, Union
 
 from data_juicer.utils.constant import Fields
 
-from ..base_op import OPERATORS, Filter
+from ...base_op import OPERATORS, Filter
 
 
 @OPERATORS.register_module('suffix_filter')

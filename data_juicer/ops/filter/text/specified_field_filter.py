@@ -1,6 +1,6 @@
 from typing import List, Tuple, Union
 
-from ..base_op import OPERATORS, Filter
+from ...base_op import OPERATORS, Filter
 
 
 @OPERATORS.register_module('specified_field_filter')

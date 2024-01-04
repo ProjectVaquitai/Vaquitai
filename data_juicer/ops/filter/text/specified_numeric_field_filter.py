@@ -1,6 +1,6 @@
 import sys
 
-from ..base_op import OPERATORS, Filter
+from ...base_op import OPERATORS, Filter
 
 
 def is_number(s):

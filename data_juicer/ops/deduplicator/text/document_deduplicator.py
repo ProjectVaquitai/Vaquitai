@@ -11,7 +11,7 @@ import regex as re
 
 from data_juicer.utils.constant import HashKeys
 
-from ..base_op import OPERATORS, Deduplicator
+from ...base_op import OPERATORS, Deduplicator
 
 
 @OPERATORS.register_module('document_deduplicator')

@@ -8,28 +8,29 @@ from data_juicer.utils.mm_utils import (SpecialTokens, load_image,
                                         remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Filter
-from ..op_fusion import LOADED_IMAGES
+from ...base_op import OPERATORS, Filter
+from ...op_fusion import LOADED_IMAGES
 
-OP_NAME = 'image_text_matching_filter'
+OP_NAME = 'image_text_similarity_filter'
 
 with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
+
     import torch
     import transformers  # noqa: F401
 
-    # avoid hanging when calling blip in multiprocessing
+    # avoid hanging when calling clip in multiprocessing
     torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
-class ImageTextMatchingFilter(Filter):
-    """Filter to keep samples those matching score between image and text
+class ImageTextSimilarityFilter(Filter):
+    """Filter to keep samples those similarity between image and text
     within a specific range."""
 
     def __init__(self,
-                 hf_blip='Salesforce/blip-itm-base-coco',
-                 min_score: ClosedUnitInterval = 0.003,
+                 hf_clip='openai/clip-vit-base-patch32',
+                 min_score: ClosedUnitInterval = 0.1,
                  max_score: ClosedUnitInterval = 1.0,
                  horizontal_flip: bool = False,
                  vertical_flip: bool = False,
@@ -40,10 +41,10 @@ class ImageTextMatchingFilter(Filter):
         """
         Initialization method.
 
-        :param hf_blip: blip model name on huggingface to compute
-            the matching score between image and text.
-        :param min_score: The min matching score to keep samples.
-        :param max_score: The max matching score to keep samples.
+        :param hf_clip: clip model name on huggingface to compute
+            the similarity between image and text.
+        :param min_score: The min similarity to keep samples.
+        :param max_score: The max similarity to keep samples.
         :param horizontal_flip: Flip image horizontally (left to right).
         :param vertical_flip: Flip image vertically (top to bottom).
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
@@ -68,21 +69,20 @@ class ImageTextMatchingFilter(Filter):
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
-        self.model_key = prepare_model(model_type='hf_blip', model_key=hf_blip)
+        self.model_key = prepare_model(model_type='hf_clip', model_key=hf_clip)
         self.reduce_mode = reduce_mode
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip
 
     def compute_stats(self, sample, context=False):
         # check if it's computed already
-        if StatsKeys.image_text_matching_score in sample[Fields.stats]:
+        if StatsKeys.image_text_similarity in sample[Fields.stats]:
             return sample
 
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
-            sample[Fields.stats][
-                StatsKeys.image_text_matching_score] = np.array(
-                    [], dtype=np.float64)
+            sample[Fields.stats][StatsKeys.image_text_similarity] = np.array(
+                [], dtype=np.float64)
             return sample
 
         # load images
@@ -104,7 +104,7 @@ class ImageTextMatchingFilter(Filter):
 
         text = sample[self.text_key]
         offset = 0
-        matching_scores = []
+        similarity = []
         model, processor = get_model(self.model_key)
 
         for chunk in text.split(SpecialTokens.eoc):
@@ -133,31 +133,29 @@ class ImageTextMatchingFilter(Filter):
                                    padding=True)
 
                 outputs = model(**inputs)
-                itm_scores = outputs.itm_score.detach().cpu().softmax(
-                    dim=-1)[:, 1]
+                chunk_logits = outputs.logits_per_text.detach().cpu() / 100.0
 
                 if self.reduce_mode == 'avg':
-                    chunk_itm_score = itm_scores.mean()
+                    chunk_similarity = chunk_logits.mean()
                 elif self.reduce_mode == 'max':
-                    chunk_itm_score = itm_scores.max()
+                    chunk_similarity = chunk_logits.max()
                 else:
-                    chunk_itm_score = itm_scores.min()
+                    chunk_similarity = chunk_logits.min()
 
-                matching_scores.append(float(chunk_itm_score))
+                similarity.append(float(chunk_similarity))
             offset += count
-        sample[Fields.stats][
-            StatsKeys.image_text_matching_score] = matching_scores
+        sample[Fields.stats][StatsKeys.image_text_similarity] = similarity
 
         return sample
 
     def process(self, sample):
-        itm_scores = sample[Fields.stats][StatsKeys.image_text_matching_score]
-        if len(itm_scores) <= 0:
+        similarity = sample[Fields.stats][StatsKeys.image_text_similarity]
+        if len(similarity) <= 0:
             return True
 
         keep_bools = np.array([
-            self.min_score <= itm_score <= self.max_score
-            for itm_score in itm_scores
+            self.min_score <= sim_value <= self.max_score
+            for sim_value in similarity
         ])
 
         # different strategies

@@ -3,7 +3,7 @@ from multiprocessing import Pool
 
 from loguru import logger
 
-from data_juicer.utils.constant import Fields, HashKeys
+from data_juicer.utils.constant import Fields, HashKeys, CleaningKeys
 
 
 class Exporter:
@@ -23,6 +23,7 @@ class Exporter:
                  export_ds=True,
                  keep_stats_in_res_ds=False,
                  keep_hashes_in_res_ds=False,
+                 keep_cleaning_stas_in_res_ds=False,
                  export_stats=True):
         """
         Initialization method.
@@ -37,6 +38,8 @@ class Exporter:
             dataset.
         :param keep_hashes_in_res_ds: whether to keep hashes in the result
             dataset.
+        :param keep_cleaning_stas_in_res_ds: whether to keep cleaning stas 
+            in the result dataset.
         :param export_stats: whether to export the stats of dataset.
         """
         self.export_path = export_path
@@ -45,6 +48,7 @@ class Exporter:
         self.export_ds = export_ds
         self.keep_stats_in_res_ds = keep_stats_in_res_ds
         self.keep_hashes_in_res_ds = keep_hashes_in_res_ds
+        self.keep_cleaning_stas_in_res_ds = keep_cleaning_stas_in_res_ds
         self.export_stats = export_stats
         self.suffix = self._get_suffix(export_path)
         self.num_proc = num_proc
@@ -127,6 +131,13 @@ class Exporter:
                 extra_fields = {
                     HashKeys.hash, HashKeys.minhash, HashKeys.simhash,
                     HashKeys.imagehash
+                }
+                feature_fields = set(dataset.features.keys())
+                removed_fields = extra_fields.intersection(feature_fields)
+                dataset = dataset.remove_columns(removed_fields)
+            if not self.keep_cleaning_stas_in_res_ds:
+                extra_fields = {
+                    CleaningKeys.brightness, CleaningKeys.blurriness
                 }
                 feature_fields = set(dataset.features.keys())
                 removed_fields = extra_fields.intersection(feature_fields)
