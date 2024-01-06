@@ -249,3 +249,6 @@ process:
       top_ratio:                                              # ratio of selected top specified field value
       topk:                                                   # number of selected top specified field value
       reverse: True                                           # determine the sorting rule, if reverse=True, then sort in descending order
+
+# Mycleanlab ops
+- cleanvision_mycleanlab:

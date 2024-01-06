@@ -5,7 +5,7 @@ from loguru import logger
 
 from data_juicer.config import init_configs
 from data_juicer.format.load import load_formatter
-from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
+from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector, Mycleanlab,
                              load_ops)
 from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
@@ -165,6 +165,12 @@ class Executor:
                     tmp, dup_pairs = op.process(
                         dataset, self.tracer.show_num if self.open_tracer
                         and op_name in self.op_list_to_trace else 0)
+                    if self.open_tracer and op_name in self.op_list_to_trace:
+                        self.tracer.trace_deduplicator(op_name, dup_pairs)
+                elif isinstance(op, Mycleanlab):   
+                    if self.cfg.use_checkpoint:
+                        prev = dataset
+                    tmp = op.process(dataset)
                     if self.open_tracer and op_name in self.op_list_to_trace:
                         self.tracer.trace_deduplicator(op_name, dup_pairs)
                 else:

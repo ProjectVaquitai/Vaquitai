@@ -447,8 +447,10 @@ def sort_op_by_types_and_names(op_name_classes):
                         if 'deduplicator' in name]
     selector_ops = [(name, c) for (name, c) in op_name_classes
                     if 'selector' in name]
+    mycleanlab_ops = [(name, c) for (name, c) in op_name_classes
+                    if 'mycleanlab' in name]
     ops_sorted_by_types = sorted(mapper_ops) + sorted(filter_ops) + sorted(
-        deduplicator_ops) + sorted(selector_ops)
+        deduplicator_ops) + sorted(selector_ops) + sorted(mycleanlab_ops)
     return ops_sorted_by_types
 
 

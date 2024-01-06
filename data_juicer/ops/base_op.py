@@ -174,3 +174,30 @@ class Selector(OP):
         :return: selected dataset.
         """
         raise NotImplementedError
+
+
+class Mycleanlab(OP):
+
+    def __init__(
+        self,
+        text_key: str = None,
+        image_key: str = None,
+    ):
+        """
+        Base class that conducts selection in dataset-level.
+
+        :param text_key: the key name of field that stores sample texts
+            to be processed
+        :param image_key: the key name of field that stores sample image list
+            to be processed
+        """
+        super(Mycleanlab, self).__init__(text_key, image_key)
+
+    def process(self, dataset):
+        """
+        Dataset --> dataset.
+
+        :param dataset: input dataset
+        :return: selected dataset.
+        """
+        raise NotImplementedError
