@@ -195,6 +195,8 @@ def unify_format(
             #           f'Please check and retry!'
             # logger.error(err_msg)
             # raise ValueError(err_msg)
+        else:
+            has_text = True
 
     if has_text:
         # 2. filter out those samples with empty or None text
