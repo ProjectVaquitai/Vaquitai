@@ -1,8 +1,5 @@
-import numpy as np
-
-from data_juicer.utils.constant import Fields, StatsKeys, CleaningKeys
-from data_juicer.utils.mm_utils import load_image
-from datasets import load_dataset,Dataset
+from data_juicer.utils.constant import DEFAULT_PREFIX
+from datasets import Dataset
 
 from ..base_op import OPERATORS, Mycleanlab
 from ..op_fusion import LOADED_IMAGES
@@ -18,6 +15,11 @@ class CleanvisionMycleanlab(Mycleanlab):
     """
 
     def __init__(self,
+                 issues: list = ["is_odd_size_issue",
+                                "is_odd_aspect_ratio_issue", 
+                                "is_low_information_issue", "is_light_issue", 
+                                "is_grayscale_issue", "is_dark_issue", "is_blurry_issue"], 
+                                # "is_exact_duplicates_issue", "is_near_duplicates_issue"],
                  *args,
                  **kwargs):
         """
@@ -27,19 +29,20 @@ class CleanvisionMycleanlab(Mycleanlab):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        self.issues = issues
 
-
-    
-    def process(self, dataset):
-        # def _open_map_helper(sample):
-        #     sample[self.image_key] = Image.open(sample[self.image_key])
-        #     # print(Image.open(sample[self.image_key]))
-        #     return sample
+    def save_results(self, sample):
+        for issue in self.issues:
+            index = self.hf_dataset[self.image_key + "_path"].index(sample.get(self.image_key))
+            sample[DEFAULT_PREFIX + issue] = self.res_df.iloc[[index]].get(issue).to_list()[0]
+        return sample
         
-        # dataset_hf = dataset.map(_open_map_helper)
-        my_dict = {"image": [Image.open(_) for _ in dataset[self.image_key]], "image_path": dataset[self.image_key]}
-        hf_dataset = Dataset.from_dict(my_dict)
-        imagelab = Imagelab(hf_dataset=hf_dataset, image_key=self.image_key)
+    def process(self, dataset):
+        my_dict = {self.image_key: [Image.open(_) for _ in dataset[self.image_key]], self.image_key + "_path": dataset[self.image_key]}
+        self.hf_dataset = Dataset.from_dict(my_dict)
+        imagelab = Imagelab(hf_dataset=self.hf_dataset, image_key=self.image_key)
         imagelab.find_issues()
+        self.res_df = imagelab.issues
+        dataset = dataset.map(self.save_results)        
         return dataset
             
