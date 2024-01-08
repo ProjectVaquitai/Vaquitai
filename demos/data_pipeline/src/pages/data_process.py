@@ -201,7 +201,7 @@ class Visualize:
                 # example_cfg_f = os.path.abspath(
                 #     os.path.join(os.path.dirname(__file__),
                 #                  './configs/demo.yaml'))
-                example_cfg_f = '/Users/chenminghua/project/data-juicer/demos/data_pipeline/configs/demo.yaml'
+                example_cfg_f = '/home/beacon/data-juicer/demos/data_pipeline/configs/demo.yaml'
                 st.text_area(label='方式一：配置文件路径',
                              key='input_cfg_cmd',
                              value=f'--config {example_cfg_f}')

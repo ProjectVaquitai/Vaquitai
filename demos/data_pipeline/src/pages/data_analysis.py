@@ -80,7 +80,7 @@ def plot_image_clusters(dataset):
 def write():
     theme_plotly = None
     tab_data_cleaning, tab_data_mining, tab_data_insights = st.tabs(['数据清洗', '数据挖掘', '数据洞察'])
-    formatter = load_formatter('/Users/chenminghua/project/data-juicer/demos/data_pipeline/outputs/demo-process/demo-processed.jsonl')
+    formatter = load_formatter('/home/beacon/data-juicer/demos/data_pipeline/outputs/demo-process/demo-processed.jsonl')
     processed_dataset = formatter.load_dataset(4)
 
     with tab_data_cleaning:
