@@ -72,7 +72,8 @@ class Executor:
             self.cfg.export_in_parallel,
             self.cfg.np,
             keep_stats_in_res_ds=self.cfg.keep_stats_in_res_ds,
-            keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds)
+            keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds,
+            keep_cleaning_stas_in_res_ds=self.cfg.keep_cleaning_stas_in_res_ds)
 
         # setup tracer
         self.open_tracer = self.cfg.open_tracer

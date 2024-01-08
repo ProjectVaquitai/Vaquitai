@@ -1,0 +1,341 @@
+
+Collecting usage statistics. To deactivate, set browser.gatherUsageStats to False.
+
+
+  Git integration is disabled.
+
+  Streamlit requires Git 2.7.0 or later, but you have 1.8.3.1.
+  Git is used by Streamlit Cloud (https://streamlit.io/cloud).
+  To enable this feature, please update Git.
+
+  You can now view your Streamlit app in your browser.
+
+  Network URL: http://10.0.16.4:80
+  External URL: http://43.143.131.114:80
+
+2023-03-08 17:49:35.259 Pandas backend loaded 1.5.3
+2023-03-08 17:49:35.264 Numpy backend loaded 1.23.5
+2023-03-08 17:49:35.264 Pyspark backend NOT loaded
+2023-03-08 17:49:35.264 Python backend loaded
+2023-03-08 17:57:00.211 Uncaught app exception
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/urllib/request.py", line 1346, in do_open
+    h.request(req.get_method(), req.selector, req.data, headers,
+  File "/usr/local/python3/lib/python3.9/http/client.py", line 1285, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/usr/local/python3/lib/python3.9/http/client.py", line 1331, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/usr/local/python3/lib/python3.9/http/client.py", line 1280, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/local/python3/lib/python3.9/http/client.py", line 1040, in _send_output
+    self.send(msg)
+  File "/usr/local/python3/lib/python3.9/http/client.py", line 980, in send
+    self.connect()
+  File "/usr/local/python3/lib/python3.9/http/client.py", line 1454, in connect
+    self.sock = self._context.wrap_socket(self.sock,
+  File "/usr/local/python3/lib/python3.9/ssl.py", line 500, in wrap_socket
+    return self.sslsocket_class._create(
+  File "/usr/local/python3/lib/python3.9/ssl.py", line 1040, in _create
+    self.do_handshake()
+  File "/usr/local/python3/lib/python3.9/ssl.py", line 1309, in do_handshake
+    self._sslobj.do_handshake()
+ssl.SSLEOFError: EOF occurred in violation of protocol (_ssl.c:1129)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 565, in _run_script
+    exec(code, module.__dict__)
+  File "/root/MtBuller/app.py", line 76, in <module>
+    main()
+  File "/root/MtBuller/app.py", line 72, in main
+    app["func"].write()
+  File "/root/MtBuller/src/pages/data_analysis.py", line 96, in write
+    df = pd.read_csv(data_download_url[option])
+  File "/usr/local/python3/lib/python3.9/site-packages/pandas/util/_decorators.py", line 211, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/pandas/util/_decorators.py", line 331, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/pandas/io/parsers/readers.py", line 950, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "/usr/local/python3/lib/python3.9/site-packages/pandas/io/parsers/readers.py", line 605, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "/usr/local/python3/lib/python3.9/site-packages/pandas/io/parsers/readers.py", line 1442, in __init__
+    self._engine = self._make_engine(f, self.engine)
+  File "/usr/local/python3/lib/python3.9/site-packages/pandas/io/parsers/readers.py", line 1735, in _make_engine
+    self.handles = get_handle(
+  File "/usr/local/python3/lib/python3.9/site-packages/pandas/io/common.py", line 713, in get_handle
+    ioargs = _get_filepath_or_buffer(
+  File "/usr/local/python3/lib/python3.9/site-packages/pandas/io/common.py", line 363, in _get_filepath_or_buffer
+    with urlopen(req_info) as req:
+  File "/usr/local/python3/lib/python3.9/site-packages/pandas/io/common.py", line 265, in urlopen
+    return urllib.request.urlopen(*args, **kwargs)
+  File "/usr/local/python3/lib/python3.9/urllib/request.py", line 214, in urlopen
+    return opener.open(url, data, timeout)
+  File "/usr/local/python3/lib/python3.9/urllib/request.py", line 517, in open
+    response = self._open(req, data)
+  File "/usr/local/python3/lib/python3.9/urllib/request.py", line 534, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+  File "/usr/local/python3/lib/python3.9/urllib/request.py", line 494, in _call_chain
+    result = func(*args)
+  File "/usr/local/python3/lib/python3.9/urllib/request.py", line 1389, in https_open
+    return self.do_open(http.client.HTTPSConnection, req,
+  File "/usr/local/python3/lib/python3.9/urllib/request.py", line 1349, in do_open
+    raise URLError(err)
+urllib.error.URLError: <urlopen error EOF occurred in violation of protocol (_ssl.c:1129)>
+2023-03-08 18:01:53.094 MediaFileHandler: Missing file 13b28b9ab1235ea9e35ec552b117cd51d95d6437824d80b167892b91.jpg
+2023-03-08 18:11:12.088 `st.cache` is deprecated. Please use one of Streamlit's new caching commands,
+`st.cache_data` or `st.cache_resource`.
+
+More information [in our docs](https://docs.streamlit.io/library/advanced-features/caching).
+Summarize dataset:   0%|          | 0/5 [00:00<?, ?it/s]Summarize dataset:   0%|          | 0/10 [00:00<?, ?it/s, Describe variable:a]Summarize dataset:  10%|█         | 1/10 [00:00<00:00, 42.22it/s, Describe variable:c]Summarize dataset:  20%|██        | 2/10 [00:00<00:00, 70.46it/s, Describe variable:b]Summarize dataset:  30%|███       | 3/10 [00:00<00:00, 78.10it/s, Describe variable:d]Summarize dataset:  40%|████      | 4/10 [00:00<00:00, 103.70it/s, Describe variable:e]Summarize dataset:  50%|█████     | 5/10 [00:00<00:00, 126.06it/s, Get variable types] Summarize dataset:  50%|█████     | 6/12 [00:00<00:00, 150.49it/s, Calculate auto correlation]Summarize dataset:  58%|█████▊    | 7/12 [00:00<00:00, 125.14it/s, Get scatter matrix]        Summarize dataset:  19%|█▉        | 7/37 [00:00<00:00, 124.69it/s, scatter a, a]      Summarize dataset:  22%|██▏       | 8/37 [00:00<00:00, 30.13it/s, scatter a, a] Summarize dataset:  22%|██▏       | 8/37 [00:00<00:00, 30.13it/s, scatter b, a]Summarize dataset:  24%|██▍       | 9/37 [00:00<00:00, 30.13it/s, scatter c, a]Summarize dataset:  27%|██▋       | 10/37 [00:00<00:00, 30.13it/s, scatter d, a]Summarize dataset:  30%|██▉       | 11/37 [00:00<00:00, 30.13it/s, scatter e, a]Summarize dataset:  32%|███▏      | 12/37 [00:01<00:02,  9.53it/s, scatter e, a]Summarize dataset:  32%|███▏      | 12/37 [00:01<00:02,  9.53it/s, scatter a, b]Summarize dataset:  35%|███▌      | 13/37 [00:01<00:02,  9.53it/s, scatter b, b]Summarize dataset:  38%|███▊      | 14/37 [00:01<00:02,  7.93it/s, scatter b, b]Summarize dataset:  38%|███▊      | 14/37 [00:01<00:02,  7.93it/s, scatter c, b]Summarize dataset:  41%|████      | 15/37 [00:01<00:02,  7.93it/s, scatter d, b]Summarize dataset:  43%|████▎     | 16/37 [00:01<00:03,  6.92it/s, scatter d, b]Summarize dataset:  43%|████▎     | 16/37 [00:01<00:03,  6.92it/s, scatter e, b]Summarize dataset:  46%|████▌     | 17/37 [00:02<00:03,  6.57it/s, scatter e, b]Summarize dataset:  46%|████▌     | 17/37 [00:02<00:03,  6.57it/s, scatter a, c]Summarize dataset:  49%|████▊     | 18/37 [00:02<00:03,  6.22it/s, scatter a, c]Summarize dataset:  49%|████▊     | 18/37 [00:02<00:03,  6.22it/s, scatter b, c]Summarize dataset:  51%|█████▏    | 19/37 [00:02<00:03,  5.86it/s, scatter b, c]Summarize dataset:  51%|█████▏    | 19/37 [00:02<00:03,  5.86it/s, scatter c, c]Summarize dataset:  54%|█████▍    | 20/37 [00:02<00:03,  5.62it/s, scatter c, c]Summarize dataset:  54%|█████▍    | 20/37 [00:02<00:03,  5.62it/s, scatter d, c]Summarize dataset:  57%|█████▋    | 21/37 [00:02<00:02,  5.44it/s, scatter d, c]Summarize dataset:  57%|█████▋    | 21/37 [00:02<00:02,  5.44it/s, scatter e, c]Summarize dataset:  59%|█████▉    | 22/37 [00:03<00:02,  5.32it/s, scatter e, c]Summarize dataset:  59%|█████▉    | 22/37 [00:03<00:02,  5.32it/s, scatter a, d]Summarize dataset:  62%|██████▏   | 23/37 [00:03<00:02,  5.22it/s, scatter a, d]Summarize dataset:  62%|██████▏   | 23/37 [00:03<00:02,  5.22it/s, scatter b, d]Summarize dataset:  65%|██████▍   | 24/37 [00:03<00:02,  5.14it/s, scatter b, d]Summarize dataset:  65%|██████▍   | 24/37 [00:03<00:02,  5.14it/s, scatter c, d]Summarize dataset:  68%|██████▊   | 25/37 [00:03<00:02,  5.11it/s, scatter c, d]Summarize dataset:  68%|██████▊   | 25/37 [00:03<00:02,  5.11it/s, scatter d, d]Summarize dataset:  70%|███████   | 26/37 [00:03<00:02,  5.09it/s, scatter d, d]Summarize dataset:  70%|███████   | 26/37 [00:03<00:02,  5.09it/s, scatter e, d]Summarize dataset:  73%|███████▎  | 27/37 [00:04<00:01,  5.04it/s, scatter e, d]Summarize dataset:  73%|███████▎  | 27/37 [00:04<00:01,  5.04it/s, scatter a, e]Summarize dataset:  76%|███████▌  | 28/37 [00:04<00:01,  5.03it/s, scatter a, e]Summarize dataset:  76%|███████▌  | 28/37 [00:04<00:01,  5.03it/s, scatter b, e]Summarize dataset:  78%|███████▊  | 29/37 [00:04<00:01,  5.05it/s, scatter b, e]Summarize dataset:  78%|███████▊  | 29/37 [00:04<00:01,  5.05it/s, scatter c, e]Summarize dataset:  81%|████████  | 30/37 [00:04<00:01,  5.02it/s, scatter c, e]Summarize dataset:  81%|████████  | 30/37 [00:04<00:01,  5.02it/s, scatter d, e]Summarize dataset:  84%|████████▍ | 31/37 [00:04<00:01,  5.03it/s, scatter d, e]Summarize dataset:  84%|████████▍ | 31/37 [00:04<00:01,  5.03it/s, scatter e, e]Summarize dataset:  86%|████████▋ | 32/37 [00:05<00:00,  5.04it/s, scatter e, e]Summarize dataset:  86%|████████▋ | 32/37 [00:05<00:00,  5.04it/s, Get dataframe statistics]Summarize dataset:  85%|████████▍ | 33/39 [00:05<00:01,  5.04it/s, Missing diagram bar]     Summarize dataset:  87%|████████▋ | 34/39 [00:05<00:00,  5.55it/s, Missing diagram bar]Summarize dataset:  87%|████████▋ | 34/39 [00:05<00:00,  5.55it/s, Missing diagram matrix]Summarize dataset:  90%|████████▉ | 35/39 [00:05<00:00,  6.00it/s, Missing diagram matrix]Summarize dataset:  90%|████████▉ | 35/39 [00:05<00:00,  6.00it/s, Take sample]           Summarize dataset:  92%|█████████▏| 36/39 [00:05<00:00,  6.00it/s, Detecting duplicates]Summarize dataset:  95%|█████████▍| 37/39 [00:05<00:00,  6.00it/s, Get alerts]          Summarize dataset:  97%|█████████▋| 38/39 [00:05<00:00,  6.00it/s, Get reproduction details]Summarize dataset: 100%|██████████| 39/39 [00:05<00:00,  6.00it/s, Completed]               Summarize dataset: 100%|██████████| 39/39 [00:05<00:00,  7.03it/s, Completed]
+Generate report structure:   0%|          | 0/1 [00:00<?, ?it/s]Generate report structure: 100%|██████████| 1/1 [00:02<00:00,  2.88s/it]Generate report structure: 100%|██████████| 1/1 [00:02<00:00,  2.88s/it]
+Render HTML:   0%|          | 0/1 [00:00<?, ?it/s]Render HTML: 100%|██████████| 1/1 [00:00<00:00,  1.86it/s]Render HTML: 100%|██████████| 1/1 [00:00<00:00,  1.86it/s]
+2023-03-09 04:08:00.826 MediaFileHandler: Missing file 13b28b9ab1235ea9e35ec552b117cd51d95d6437824d80b167892b91.jpg
+2023-03-09 05:47:34.603 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-09 10:30:05.200 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-09 21:11:40.317 MediaFileHandler: Missing file 13b28b9ab1235ea9e35ec552b117cd51d95d6437824d80b167892b91.jpg
+2023-03-10 08:36:07.892 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-10 18:58:06.180 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-10 19:44:54.334 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-11 03:40:57.299 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-12 05:19:14.564 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-12 13:40:12.526 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-13 05:31:59.873 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-13 07:59:21.228 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-13 10:03:26.073 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-14 13:59:00.910 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-15 01:58:44.812 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+
+Collecting usage statistics. To deactivate, set browser.gatherUsageStats to False.
+
+
+  Git integration is disabled.
+
+  Streamlit requires Git 2.7.0 or later, but you have 1.8.3.1.
+  Git is used by Streamlit Cloud (https://streamlit.io/cloud).
+  To enable this feature, please update Git.
+
+  You can now view your Streamlit app in your browser.
+
+  Network URL: http://10.0.16.4:80
+  External URL: http://43.143.131.114:80
+
+2023-03-15 09:57:30.382 Pandas backend loaded 1.5.3
+2023-03-15 09:57:30.387 Numpy backend loaded 1.23.5
+2023-03-15 09:57:30.387 Pyspark backend NOT loaded
+2023-03-15 09:57:30.387 Python backend loaded
+2023-03-15 10:03:20.346 MediaFileHandler: Missing file 13b28b9ab1235ea9e35ec552b117cd51d95d6437824d80b167892b91.jpg
+2023-03-15 10:25:53.175 Uncaught app exception
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 565, in _run_script
+    exec(code, module.__dict__)
+  File "/root/MtBuller/app.py", line 11, in <module>
+    import src.pages.resources
+  File "/root/MtBuller/src/pages/resources.py", line 58
+    #     )
+           ^
+IndentationError: expected an indented block
+2023-03-15 13:03:17.645 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-15 17:49:24.115 MediaFileHandler: Missing file 13b28b9ab1235ea9e35ec552b117cd51d95d6437824d80b167892b91.jpg
+2023-03-16 08:00:28.226 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-16 16:40:47.533 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-17 18:58:16.719 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-18 04:27:59.797 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-20 01:49:37.651 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-20 23:41:31.687 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-21 15:55:31.967 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 15:55:32.688 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 15:55:32.927 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 15:55:33.203 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 15:55:33.559 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 15:55:34.039 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 15:55:34.295 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 15:55:34.787 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 15:55:35.246 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 15:55:35.759 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 15:55:35.979 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 15:55:36.379 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 15:55:36.887 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 15:55:37.335 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 15:55:38.256 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 15:55:38.427 Uncaught exception GET /_stcore/stream (114.254.0.134)
+HTTPServerRequest(protocol='http', host='datacentric.club', method='GET', uri='/_stcore/stream', version='HTTP/1.1', remote_ip='114.254.0.134')
+Traceback (most recent call last):
+  File "/usr/local/python3/lib/python3.9/site-packages/tornado/websocket.py", line 942, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/web/server/browser_websocket_handler.py", line 123, in open
+    self._session_id = self._runtime.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/runtime.py", line 349, in connect_session
+    session_id = self._session_mgr.connect_session(
+  File "/usr/local/python3/lib/python3.9/site-packages/streamlit/runtime/websocket_session_manager.py", line 65, in connect_session
+    assert (
+AssertionError: session with id '679ef04d-ca14-4126-8880-ec694b1e9a88' is already connected!
+2023-03-21 16:24:45.195 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-22 13:05:45.964 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml
+2023-03-25 10:26:17.299 MediaFileHandler: Missing file wp-includes/wlwmanifest.xml

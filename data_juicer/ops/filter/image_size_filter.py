@@ -8,7 +8,7 @@ from ..base_op import OPERATORS, Filter
 
 @OPERATORS.register_module('image_size_filter')
 class ImageSizeFilter(Filter):
-    """Keep data samples whose image size (in bytes/kb/MB/...) within a
+    """Keep data samples whose image size (in bytes/kb/MB/..) within a
     specific range.
     """
 

@@ -85,6 +85,10 @@ process:
       keep_alphabet: true                                     # whether to keep alpabet
       keep_number: true                                       # whether to keep number
       keep_punc: true                                         # whether to keep punctuation
+  - remove_repeat_sentences_mapper:                         # remove repeat sentences in text samples.
+      lowercase: false                                        # whether to convert sample text to lower case
+      ignore_special_character: true                          # whether to ignore special characters when judging repeated sentences. Special characters are all characters except Chinese characters, letters and numbers
+      min_repeat_sentence_length: 2                           # sentences shorter than this length will not be deduplicated. If ignore_special_character is set to True, then special characters are not included in this length
   - remove_specific_chars_mapper:                           # remove characters specified by users
       chars_to_remove: '◆●■►▼▲▴∆▻▷❖♡□'                        # a string or a list including those characters that need to be removed
   - remove_table_text_mapper:                               # remove possible table texts from text.
@@ -126,6 +130,11 @@ process:
       min_ratio: 0.333                                        # the min aspect ratio of filter range
       max_ratio: 3.0                                          # the max aspect ratio of filter range
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+  - image_brightness_filter:
+      max_brightness: 200
+      min_brightness: 20
+  - image_blurriness_filter:
+      threshold: 500
   - image_shape_filter:                                     # filter samples according to the widths and heights of images in them
       min_width: 200                                          # the min width of width filter range
       max_width: 5000                                         # the max width of width filter range
@@ -227,9 +236,8 @@ process:
       hamming_distance: 4                                     # the max hamming distance to regard 2 samples as similar enough pair. Should be less than num_blocks always
       lowercase: true                                         # whether to convert text to lower case
       ignore_pattern: null                                    # whether to ignore sub-strings with specific pattern when computing simhash.
-  - image_deduplicator:                                     # deduplicator to deduplicate samples at document-level using exact matching of images between documents.
+  - image_deduplicator:                                     # deduplicator to deduplicate samples at image-level
       method: phash                                           # hash method for image. One of [phash, dhash, whash, ahash]
-
   # Selector ops
   - topk_specified_field_selector:                          # selector to select top samples based on the sorted specified field
       field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
