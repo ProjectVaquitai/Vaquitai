@@ -12,10 +12,10 @@ export_path: './outputs/demo-cleaning/demo-cleaning.jsonl'
 # a list of several process operators with their arguments
 process:
   - cleanvision_mycleanlab:
-      # issues: ["is_odd_size_issue",]
-  - image_deduplicator:
-  - image_brightness_filter:
-  - image_blurriness_filter:
-  - image_feature_extract_generator:                                # extract embeddings for images 
-  - image_caption_generator:
-  - feature_reduce_generator:  
+      issues: ["is_odd_size_issue", "is_low_information_issue"]
+  # - image_deduplicator:
+  # - image_brightness_filter:
+  # - image_blurriness_filter:
+  # - image_feature_extract_generator:                                # extract embeddings for images 
+  # - image_caption_generator:
+  # - feature_reduce_generator:  

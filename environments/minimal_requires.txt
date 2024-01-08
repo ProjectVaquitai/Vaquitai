@@ -24,3 +24,4 @@ opencv-python
 umap-learn
 streamlit_option_menu
 sweetviz
+faiss_cpu
