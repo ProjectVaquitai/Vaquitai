@@ -2,7 +2,7 @@
 # data & resources
 models/
 outputs/
-assets/
+# assets/
 
 # setup
 data_juicer.egg-info/
