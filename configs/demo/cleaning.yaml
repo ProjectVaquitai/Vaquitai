@@ -16,3 +16,6 @@ process:
   - image_deduplicator:
   - image_brightness_filter:
   - image_blurriness_filter:
+  - image_feature_extract_generator:                                # extract embeddings for images 
+  - image_caption_generator:
+  - feature_reduce_generator:  
