@@ -438,7 +438,8 @@ def sort_op_by_types_and_names(op_name_classes):
     :return: sorted op list , each item is a pair of op_name and
         op_class
     """
-
+    generator_ops = [(name, c) for (name, c) in op_name_classes
+                             if 'generator' in name ]
     mapper_ops = [(name, c) for (name, c) in op_name_classes
                   if 'mapper' in name]
     filter_ops = [(name, c) for (name, c) in op_name_classes
@@ -449,8 +450,9 @@ def sort_op_by_types_and_names(op_name_classes):
                     if 'selector' in name]
     mycleanlab_ops = [(name, c) for (name, c) in op_name_classes
                     if 'mycleanlab' in name]
-    ops_sorted_by_types = sorted(mapper_ops) + sorted(filter_ops) + sorted(
-        deduplicator_ops) + sorted(selector_ops) + sorted(mycleanlab_ops)
+    ops_sorted_by_types = sorted(generator_ops) + sorted(mapper_ops)\
+                        + sorted(filter_ops) + sorted(deduplicator_ops)\
+                        + sorted(selector_ops) + sorted(mycleanlab_ops)
     return ops_sorted_by_types
 
 

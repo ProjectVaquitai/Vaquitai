@@ -17,3 +17,4 @@ wandb/
 __pycache__
 demos/data_image
 .vscode
+nohup.out
