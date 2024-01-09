@@ -131,89 +131,65 @@ def process_and_show_res():
 
 
     logger.info('=========Stage 3: analyze the processed data==========')
-    analysis_res_processed = pd.DataFrame()
-    try:
-        if len(processed_dataset) > 0:
-            cfg_for_processed_data = copy.deepcopy(cfg)
-            cfg_for_processed_data.dataset_path = cfg.export_path
+    # analysis_res_processed = pd.DataFrame()
+    # try:
+    #     if len(processed_dataset) > 0:
+    #         cfg_for_processed_data = copy.deepcopy(cfg)
+    #         cfg_for_processed_data.dataset_path = cfg.export_path
 
-            cfg_for_processed_data.export_path = os.path.dirname(
-                cfg.export_path) + '_processed/data.jsonl'
+    #         cfg_for_processed_data.export_path = os.path.dirname(
+    #             cfg.export_path) + '_processed/data.jsonl'
 
-            analyzer = Analyser(cfg_for_processed_data)
-            analyzer.analysis_path = os.path.dirname(
-                cfg_for_processed_data.export_path) + '/analysis'
-            analyzer.run()
+    #         analyzer = Analyser(cfg_for_processed_data)
+    #         analyzer.analysis_path = os.path.dirname(
+    #             cfg_for_processed_data.export_path) + '/analysis'
+    #         analyzer.run()
 
-            overall_file = os.path.join(analyzer.analysis_path, 'overall.csv')
-            if os.path.exists(overall_file):
-                analysis_res_processed = pd.read_csv(overall_file)
+    #         overall_file = os.path.join(analyzer.analysis_path, 'overall.csv')
+    #         if os.path.exists(overall_file):
+    #             analysis_res_processed = pd.read_csv(overall_file)
 
-            if os.path.exists(analyzer.analysis_path):
-                for f_path in os.listdir(analyzer.analysis_path):
-                    if '.png' in f_path and 'all-stats' in f_path:
-                        images_processed.append(
-                            os.path.join(analyzer.analysis_path, f_path))
-        else:
-            st.warning('No sample left after processing. Please change \
-                anther dataset or op parameters then rerun')
-    except Exception as e:
-        st.warning(f'Something error with {str(e)}')
+    #         if os.path.exists(analyzer.analysis_path):
+    #             for f_path in os.listdir(analyzer.analysis_path):
+    #                 if '.png' in f_path and 'all-stats' in f_path:
+    #                     images_processed.append(
+    #                         os.path.join(analyzer.analysis_path, f_path))
+    #     else:
+    #         st.warning('No sample left after processing. Please change \
+    #             anther dataset or op parameters then rerun')
+    # except Exception as e:
+    #     st.warning(f'Something error with {str(e)}')
 
     logger.info('=========Stage 4: Render the analysis results==========')
     st.session_state.processed_dataset = processed_dataset
-    st.session_state.processed_overall = analysis_res_processed
-    st.session_state.processed_imgs = images_processed
+    # st.session_state.processed_overall = analysis_res_processed
+    # st.session_state.processed_imgs = images_processed
 
 
 class Visualize:
 
     @staticmethod
     def setup():
-        # st.set_page_config(
-        #     page_title='数据处理',
-        #     page_icon=':smile',
-        #     layout='wide',
-        #     initial_sidebar_state="expanded",
-        # )
-
-        # readme_link = 'https://github.com/alibaba/data-juicer'
         st.markdown(
             '<div align = "center"> <font size = "30"> 数据处理 \
             </font> </div>',
             unsafe_allow_html=True,
         )
-        # st.markdown(
-        #     f'<div align = "center"> A One-Stop Data Processing System for \
-        #         Large Language Models, \
-        #         see more details in our <a href={readme_link}>Github</a></div>',
-        #     unsafe_allow_html=True,
-        # )
-        # return
 
     @staticmethod
     def parser():
         with st.expander('配置', expanded=True):
-            st.markdown('请指定配置文件：可通过(1)配置文件路径或者(2)上传配置文件')
+            st.markdown('请指定配置文件：可通过&nbsp;&nbsp;&nbsp;方式一：配置文件路径或者&nbsp;&nbsp;&nbsp;方式二：上传配置文件', unsafe_allow_html=True)
 
             col1, col2 = st.columns(2)
             with col1:
-                # example_cfg_f = os.path.abspath(
-                #     os.path.join(os.path.dirname(__file__),
-                #                  './configs/demo.yaml'))
-                example_cfg_f = '/Users/chenminghua/project/data-juicer/demos/data_pipeline/configs/demo.yaml'
+                example_cfg_f = './configs/demo.yaml'
+                example_cfg_f = os.path.abspath(example_cfg_f)
+
                 st.text_area(label='方式一：配置文件路径',
                              key='input_cfg_cmd',
                              value=f'--config {example_cfg_f}')
-                # example_my_cmd = '--dataset_path ./data/demo-dataset.jsonl ' \
-                #                  '--export_path '\
-                #                  './outputs/demo/demo-processed.jsonl'
 
-                # st.text_area(
-                #     label='cmd example. (the cmd-args will override '
-                #     'yaml-file-args)',
-                #     disabled=True,
-                #     value=f'--config {example_cfg_f} {example_my_cmd}')
 
             with col2:
                 st.file_uploader(label='方式二：上传配置文件',
@@ -232,75 +208,25 @@ class Visualize:
             
             st.text_area(label='配置文件解析结果', value=text2)
 
-            # col3, col4 = st.columns(2)
-            # with col3:
-            #     st.text_area(label='Parsed Cfg (in memory)', value=text1)
-            # with col4:
-            #     st.text_area(label='Specified Cfg (in yaml file)', value=text2)
 
     @staticmethod
     def analyze_process():
-        # start_btn = st.button(
-        #     '2. Start to analyze original data (per filter op)',
-        #     use_container_width=True)
         start_btn_process = st.button('3. 执行数据处理',
                                       type = 'primary',
                                       use_container_width=True)
 
         with st.expander('Data Analysis Results', expanded=True):
-
-            # if start_btn:
-            #     with st.spinner('Wait for analyze...'):
-            #         analyze_and_show_res()
-
             if start_btn_process:
                 with st.spinner('Wait for process...'):
                     process_and_show_res()
+                st.markdown('<font color="green">数据处理已完成，请查看数据分析结果</font>', unsafe_allow_html=True)
 
-            original_overall = st.session_state.get('original_overall', None)
-            original_imgs = st.session_state.get('original_imgs', [])
-            processed_overall = st.session_state.get('processed_overall', None)
-            processed_imgs = st.session_state.get('processed_imgs', [])
+            # original_overall = st.session_state.get('original_overall', None)
+            # original_imgs = st.session_state.get('original_imgs', [])
+            # processed_overall = st.session_state.get('processed_overall', None)
+            # processed_imgs = st.session_state.get('processed_imgs', [])
 
-            # display_dataset_details = st.checkbox('Display dataset details')
 
-            # col1, col2 = st.columns(2)
-            # with col1:
-            #     st.header('Original Data')
-            #     if display_dataset_details:
-            #         st.subheader('Details')
-            #         analyzed_dataset = st.session_state.get(
-            #             'analyzed_dataset', None)
-            #         st.dataframe(analyzed_dataset, use_container_width=True)
-            #         st.download_button('Download Original data as JSONL',
-            #                            data=convert_to_jsonl(
-            #                                pd.DataFrame(analyzed_dataset)),
-            #                            file_name='original_dataset.jsonl')
-
-            # with col2:
-            #     st.header('Processed Data')
-            #     if display_dataset_details:
-            #         st.subheader('Details')
-            #         processed_dataset = st.session_state.get(
-            #             'processed_dataset', None)
-            #         st.dataframe(processed_dataset, use_container_width=True)
-            #         st.download_button('Download Processed data as JSONL',
-            #                            data=convert_to_jsonl(
-            #                                pd.DataFrame(processed_dataset)),
-            #                            file_name='processed_dataset.jsonl')
-
-            # col1, col2 = st.columns(2)
-            # with col1:
-            #     st.subheader('Statistics')
-            #     st.dataframe(original_overall, use_container_width=True)
-            #     for img in original_imgs:
-            #         st.image(img, output_format='png')
-
-            # with col2:
-            #     st.subheader('Statistics')
-            #     st.dataframe(processed_overall, use_container_width=True)
-            #     for img in processed_imgs:
-            #         st.image(img, output_format='png')
 
     @staticmethod
     def visualize():

@@ -17,6 +17,7 @@ process:
   - image_blurriness_filter:
   - image_brightness_filter:
   - image_deduplicator:
+  - cleanvision_mycleanlab:
   - image_feature_extract_generator:
   - image_caption_generator:
   - feature_reduce_generator:

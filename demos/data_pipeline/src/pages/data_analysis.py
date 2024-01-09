@@ -7,11 +7,8 @@
 import numpy as np
 import pandas as pd
 import faiss
-import PIL
 from PIL import Image
 import altair as alt
-import plotly.express as px
-import plotly.subplots as sp
 import plotly.graph_objects as go
 import torch.nn.functional as F
 import streamlit as st
@@ -25,6 +22,12 @@ def load_model():
     model, processor = get_model(model_key)
     return model, processor
 
+@st.cache_resource
+def create_faiss_index(emb_list):
+    image_embeddings = np.array(emb_list).astype('float32')
+    faiss_index = faiss.IndexFlatL2(image_embeddings.shape[1])
+    faiss_index.add(image_embeddings)
+    return faiss_index
 
 def display_dataset(dataframe, cond, show_num, desp, type, all=True):
     examples = dataframe.loc[cond]
@@ -72,22 +75,33 @@ def plot_image_clusters(dataset):
         width=800,
         height=600,
     ).configure_legend(
-        disable=True
+        disable=False
     )
     return marker_chart
+
 
 
 def write():
     theme_plotly = None
     tab_data_cleaning, tab_data_mining, tab_data_insights = st.tabs(['数据清洗', '数据挖掘', '数据洞察'])
-    formatter = load_formatter('/Users/chenminghua/project/data-juicer/demos/data_pipeline/outputs/demo-process/demo-processed.jsonl')
-    processed_dataset = formatter.load_dataset(4)
+
+    try:
+        formatter = load_formatter('./outputs/demo-process/demo-processed.jsonl')
+        processed_dataset = formatter.load_dataset(4)
+    except:
+        st.warning('请先执行数据处理流程 !')
+        st.stop()
+
 
     with tab_data_cleaning:
-        filter_condition = {'__dj__blurriness_label': True, '__dj__brightness_label':'bright', '__dj__duplicated':True}
         filter_nums = {}
-        for key, value in filter_condition.items():
-            filter_nums[key] = sum(np.array(processed_dataset[key]) == value)
+        # iterate over the dataset to count the number of samples that are discarded
+        all_conds = np.ones(len(processed_dataset['image']), dtype=bool)
+        for key in processed_dataset.features:
+            if 'issue' not in key:
+                continue
+            all_conds = all_conds & np.array(processed_dataset[key]) == False
+            filter_nums[key] = sum(np.array(processed_dataset[key]) == True)
 
         def draw_sankey_diagram(source_data, target_data, value_data, labels):
             fig = go.Figure(data=[go.Sankey(
@@ -122,7 +136,7 @@ def write():
         
         draw_sankey_diagram(source_data, target_data, value_data, labels)
         ds = pd.DataFrame(processed_dataset)
-        all_conds = np.ones(len(ds.index), dtype=bool)
+        # all_conds = np.ones(len(ds.index), dtype=bool)
         display_dataset(ds, all_conds, 10, 'Retained sampels', 'images')
         st.download_button('Download Retained data as JSONL',
                            data=convert_to_jsonl(ds.loc[all_conds]),
@@ -133,20 +147,33 @@ def write():
                            file_name='discarded.jsonl')
 
     with tab_data_mining:
-        image_embeddings = np.array(processed_dataset['__dj__image_embedding']).astype('float32')
-        faiss_index = faiss.IndexFlatL2(image_embeddings.shape[1])
-        faiss_index.add(image_embeddings)
-        model, processor = load_model()
-        input_text = st.text_input("以文搜图: 输入相应的文本信息", 'a picture of dog')
-        inputs = processor(text=input_text, return_tensors="pt")
-        text_output = model.text_encoder(inputs.input_ids, attention_mask=inputs.attention_mask, return_dict=True) 
-        text_feature = F.normalize(model.text_proj(text_output.last_hidden_state[:,0,:]), dim=-1).detach().cpu().numpy() 
+        # st.markdown("<h1 style='text-align: center; font-size:25px; color: black;'>以文搜图", unsafe_allow_html=True)
+        if '__dj__image_embedding_2d' not in processed_dataset.features:
+            st.warning('请先执行数据处理流程(加入特征提取的算子) !')
+            st.stop()
 
-        D, I = faiss_index.search(text_feature.astype('float32'), 10)
-        retrieval_image_list = [processed_dataset['image'][i] for i in I[0]]
-        display_image_grid(retrieval_image_list, 5, 300)
+        faiss_index = create_faiss_index(processed_dataset['__dj__image_embedding'])
+        model, processor = load_model()
+
+        # 用户输入文本框
+        input_text = st.text_input("", 'a picture of dog')
+
+        # 搜索按钮
+        search_button = st.button("搜索", type="primary", use_container_width=True)
+
+        if search_button:
+            inputs = processor(text=input_text, return_tensors="pt")
+            text_output = model.text_encoder(inputs.input_ids, attention_mask=inputs.attention_mask, return_dict=True) 
+            text_feature = F.normalize(model.text_proj(text_output.last_hidden_state[:, 0, :]), dim=-1).detach().cpu().numpy() 
+
+            D, I = faiss_index.search(text_feature.astype('float32'), 10)
+            retrieval_image_list = [processed_dataset['image'][i] for i in I[0]]
+            display_image_grid(retrieval_image_list, 5, 300)
+            # Display the retrieved images using st.image
+            for image_path in retrieval_image_list:
+                st.image(image_path, caption='Retrieved Image', use_column_width=True)
 
     with tab_data_insights:
-        st.markdown("<h1 style='text-align: center; font-size:25px; color: black;'>数据分布图", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center; font-size:25px; color: black;'>数据分布可视化", unsafe_allow_html=True)
         plot = plot_image_clusters(processed_dataset)
         st.altair_chart(plot)
