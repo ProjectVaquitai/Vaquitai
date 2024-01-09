@@ -123,8 +123,9 @@ def write():
         cnt = 1
         source_data = [0]
         target_data = [cnt]
-        value_data = [1 - sum(filter_nums.values())/len(processed_dataset['image'])]
-        labels = ['Origin', 'Retained_'+str(value_data[0]*100)+'%']
+        # value_data = [1 - sum(filter_nums.values()) / len(processed_dataset['image'])]
+        value_data = [sum(all_conds) / len(processed_dataset['image'])]
+        labels = ['Origin', 'Retained_' + str(round(value_data[0]*100, 2)) + '%']
         for key, value in filter_nums.items():
             if value == 0:
                 continue
@@ -132,7 +133,7 @@ def write():
             source_data.append(0)
             target_data.append(cnt)
             value_data.append(value/len(processed_dataset[key]))
-            labels.append('Discarded_' + key+str(value_data[-1]*100)+'%')
+            labels.append('Discarded_' + key + "_" + str(round(value_data[-1]*100, 2)) + '%')
         
         draw_sankey_diagram(source_data, target_data, value_data, labels)
         ds = pd.DataFrame(processed_dataset)

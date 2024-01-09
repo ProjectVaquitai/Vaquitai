@@ -3,7 +3,7 @@
 # global parameters
 project_name: 'demo-cifar-process'
 dataset_path: '/home/beacon/data-juicer/demos/data_image/cifar10_data_dup.jsonl'  # path to your dataset directory or file
-np: 4  # number of subprocess to process your dataset
+np: 1  # number of subprocess to process your dataset
 
 image_key: 'image'
 
@@ -17,8 +17,8 @@ process:
   - image_blurriness_filter:
   - image_brightness_filter:
   - image_deduplicator:
-  - cleanvision_mycleanlab:
-  - image_feature_extract_generator:
-  - image_caption_generator:
-  - feature_reduce_generator:
+  # - cleanvision_mycleanlab:
+  # - image_feature_extract_generator:
+  # - image_caption_generator:
+  # - feature_reduce_generator:
 
