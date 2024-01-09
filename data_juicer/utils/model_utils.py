@@ -1,4 +1,5 @@
 import os
+import zipfile
 
 import wget
 from loguru import logger
@@ -24,6 +25,15 @@ BACKUP_MODEL_LINKS = {
     'punkt.%s.pickle':
     'https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/'
     'data_juicer/models/'
+}
+
+HUGGINGFACE_MODEL_PATH_CHINA = {
+    "cached":
+    "~/.cache/huggingface/hub",
+    "image_text_matching": {"name": "models--Salesforce--blip-itm-base-coco.zip", "path":
+    "https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/models--Salesforce--blip-itm-base-coco.zip"},
+    "image_caption": {"name": "models--Salesforce--blip-image-captioning-base.zip", "path":
+    "https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/models--Salesforce--blip-image-captioning-base.zip"}
 }
 
 # Default cached models links for downloading
@@ -210,11 +220,25 @@ def prepare_huggingface_blip(
     elif 'blip' in blip_name:
         if usage == 'image_text_retrieval':
             from transformers import BlipForImageTextRetrieval, BlipProcessor
-            model = BlipForImageTextRetrieval.from_pretrained(blip_name)
+            try:
+                model = BlipForImageTextRetrieval.from_pretrained(blip_name)
+            except EnvironmentError:
+                os.system("wget -c -P %s %s" %(HUGGINGFACE_MODEL_PATH_CHINA["cached"], HUGGINGFACE_MODEL_PATH_CHINA['image_text_matching']["path"]))
+                zip_path = HUGGINGFACE_MODEL_PATH_CHINA['cached'] + "/" + HUGGINGFACE_MODEL_PATH_CHINA['image_text_matching']["name"]
+                os.system("unzip %s -d %s/" % (zip_path, HUGGINGFACE_MODEL_PATH_CHINA["cached"]))
+                model = BlipForImageTextRetrieval.from_pretrained(blip_name)
+                # os.rmdir(zip_path)
             processor = BlipProcessor.from_pretrained(blip_name)
         if usage == 'image_caption':
             from transformers import BlipForConditionalGeneration, BlipProcessor
-            model = BlipForConditionalGeneration.from_pretrained(blip_name)
+            try:
+                model = BlipForConditionalGeneration.from_pretrained(blip_name)
+            except EnvironmentError:
+                os.system("wget -c -P %s %s" %(HUGGINGFACE_MODEL_PATH_CHINA["cached"], HUGGINGFACE_MODEL_PATH_CHINA['image_caption']["path"]))
+                zip_path = HUGGINGFACE_MODEL_PATH_CHINA['cached'] + "/" + HUGGINGFACE_MODEL_PATH_CHINA['image_caption']["name"]
+                os.system("unzip %s -d %s/" % (zip_path, HUGGINGFACE_MODEL_PATH_CHINA["cached"]))
+                model = BlipForConditionalGeneration.from_pretrained(blip_name)
+                # os.rmdir(zip_path)
             processor = BlipProcessor.from_pretrained(blip_name)
 
     if model is None or processor is None:
