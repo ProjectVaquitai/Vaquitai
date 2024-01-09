@@ -76,26 +76,6 @@ class ImageFeatureExtractGenerator(Generator):
         # no need to deduplicate because too few samples
         dataset = dataset.map(self.compute_embedding,
                               desc= 'image_feature_extract_process')
-
-        return dataset
         
 
-class ImageData(Dataset):
-    def __init__(self, dataset):
-        self.image_list = dataset['image']
-
-    def __len__(self):
-        return len(self.image_list)
-
-    def __getitem__(self, idx):
-        image_path = self.image_list[idx]
-        image = Image.open(image_path).convert('RGB')
-        image = self.transform(image)
-        return image
-
-    def transform(self, image):
-        transform = transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-        ])
-        return transform(image)
+        return dataset

@@ -83,9 +83,7 @@ class ImageCaptionGenerator(Generator):
             return sample
 
         # 1. load image(s)
-        image_path = sample[self.image_key]
         image = load_image(sample[self.image_key])
-        # image = self.transform(image).unsqueeze(0)
         inputs = self.img_processor(images=image, return_tensors="pt")
         outputs = self.model.generate(**inputs)
         image_caption_text = self.img_processor.decode(outputs[0], skip_special_tokens=True)

@@ -100,7 +100,7 @@ def write():
         for key in processed_dataset.features:
             if 'issue' not in key:
                 continue
-            all_conds = all_conds & np.array(processed_dataset[key]) == False
+            all_conds = all_conds & (np.array(processed_dataset[key]) == False)
             filter_nums[key] = sum(np.array(processed_dataset[key]) == True)
 
         def draw_sankey_diagram(source_data, target_data, value_data, labels):
@@ -170,8 +170,8 @@ def write():
             retrieval_image_list = [processed_dataset['image'][i] for i in I[0]]
             display_image_grid(retrieval_image_list, 5, 300)
             # Display the retrieved images using st.image
-            for image_path in retrieval_image_list:
-                st.image(image_path, caption='Retrieved Image', use_column_width=True)
+            # for image_path in retrieval_image_list:
+            #     st.image(image_path, caption='Retrieved Image', use_column_width=False)
 
     with tab_data_insights:
         st.markdown("<h1 style='text-align: center; font-size:25px; color: black;'>数据分布可视化", unsafe_allow_html=True)

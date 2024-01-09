@@ -146,11 +146,12 @@ class HashKeys(object):
     
 class CleaningKeys(object):
     # image
-    image_duplicated = DEFAULT_PREFIX + 'duplicated'
+    image_duplicated = DEFAULT_PREFIX + 'is_image_duplicated_issue'
     brightness = DEFAULT_PREFIX + 'brightness'
-    brightness_label = DEFAULT_PREFIX + 'brightness_label'
+    cv2_dark_label = DEFAULT_PREFIX + 'is_cv2_dark_issue'
+    cv2_light_label = DEFAULT_PREFIX + 'is_cv2_light_issue'
     blurriness = DEFAULT_PREFIX + 'blurriness'
-    blurriness_label = DEFAULT_PREFIX + 'blurriness_label'
+    cv2_blurriness_label = DEFAULT_PREFIX + 'is_cv2_blurriness_issue'
 
 class EmbKeys(object):
     image_embedding = DEFAULT_PREFIX + 'image_embedding'

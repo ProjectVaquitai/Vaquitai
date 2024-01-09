@@ -61,9 +61,9 @@ class ImageBlurrinessFilter(Filter):
         sample[CleaningKeys.blurriness] = _variance_of_laplacian(cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY))
         
         if sample[CleaningKeys.blurriness] < self.threshold:
-            sample[CleaningKeys.blurriness_label] = True
+            sample[CleaningKeys.cv2_blurriness_label] = True
         else:
-            sample[CleaningKeys.blurriness_label] = False
+            sample[CleaningKeys.cv2_blurriness_label] = False
             
         return sample
 
