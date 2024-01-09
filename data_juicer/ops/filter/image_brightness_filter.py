@@ -60,11 +60,14 @@ class ImageBrightnessFilter(Filter):
         sample[CleaningKeys.brightness] = np.mean(cv2.split(cv2.cvtColor(np.array(image), cv2.COLOR_RGB2HSV))[2])
         
         if sample[CleaningKeys.brightness] > self.max_brightness:
-            sample[CleaningKeys.brightness_label] = "bright"
+            sample[CleaningKeys.cv2_light_label] = True
+            sample[CleaningKeys.cv2_dark_label] = False
         elif sample[CleaningKeys.brightness] < self.min_brightness:
-            sample[CleaningKeys.brightness_label] = "dark"
+            sample[CleaningKeys.cv2_dark_label] = True
+            sample[CleaningKeys.cv2_light_label] = False
         else:
-            sample[CleaningKeys.brightness_label] = "normal"
+            sample[CleaningKeys.cv2_dark_label] = False
+            sample[CleaningKeys.cv2_light_label] = False
             
         return sample
 
