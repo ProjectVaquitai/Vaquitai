@@ -1,6 +1,3 @@
-# Mt Buller
-<!-- [**English**](README.md) | 中文 -->
-中文
 # Mt Buller: AI数据的智能化处理平台
 
 ![Mt Buller](./data_juicer/platform/src/assets/favicon.png "Mt Buller")
