@@ -6,7 +6,7 @@
 """
 
 import streamlit as st
-import src.utils.st_components as st_components
+import data_juicer.platform.src.utils.st_components as st_components
 
 def write():
     st.title("This is the Docs page.")  

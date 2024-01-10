@@ -3,7 +3,7 @@
 中文
 # Mt Buller: AI数据的智能化处理平台
 
-![Mt Buller](/demos/data_pipeline/src/assets/favicon.png "Mt Buller")
+![Mt Buller](./data_juicer/platform/src/assets/favicon.png "Mt Buller")
 
 Mt Buller 是一个AI数据的智能化处理平台，旨在解决您AI数据处理时间长，效果差，没有好用工具的问题。为您提供AI数据的看（数据洞察），加（数据挖掘），减（数据清洗）的能力。使您在最少的时间内，利用更少更好的数据让AI模型获得更高的效果。  
 本项目在积极更新和维护中，我们将定期强化和新增更多的功能和数据菜谱。欢迎您加入我们推进AI数据的处理开发和研究工作！
@@ -44,7 +44,7 @@ Mt Buller 是一个AI数据的智能化处理平台，旨在解决您AI数据处
 
 ## 特点
 
-![Overview](/demos/data_pipeline/src/images/1.png )
+![Overview](./data_juicer/platform//src/images/1.png )
 
 * **系统化 & 可复用**：为用户提供系统化且可复用的20+[配置菜谱](configs/README_ZH.md)，50+核心[算子](docs/Operators_ZH.md)和专用[工具池](#documentation)，旨在让数据处理独立于特定的大语言模型数据集和处理流水线。
 

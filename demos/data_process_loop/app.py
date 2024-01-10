@@ -193,7 +193,7 @@ class Visualize:
             with col1:
                 example_cfg_f = os.path.abspath(
                     os.path.join(os.path.dirname(__file__),
-                                 './configs/demo.yaml'))
+                                 './configs/mtbuller.yaml'))
                 st.text_area(label='(i) Input Cfg Commands',
                              key='input_cfg_cmd',
                              value=f'--config {example_cfg_f}')

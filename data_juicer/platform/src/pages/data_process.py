@@ -183,7 +183,7 @@ class Visualize:
 
             col1, col2 = st.columns(2)
             with col1:
-                example_cfg_f = './configs/demo.yaml'
+                example_cfg_f = './configs/demo/mtbuller.yaml'
                 example_cfg_f = os.path.abspath(example_cfg_f)
 
                 st.text_area(label='方式一：配置文件路径',
