@@ -67,6 +67,7 @@ class ImageCaptionGenerator(Generator):
         self.model_key = prepare_model(model_type='hf_blip',
                                        model_key=hf_blip2,
                                        usage='image_caption')
+        self.device  = "cuda" if torch.cuda.is_available() else "cpu"
         self.model_in_ctx = None
         self.img_processor_in_ctx = None
         self.caption_num = caption_num
@@ -74,6 +75,7 @@ class ImageCaptionGenerator(Generator):
         self.extra_args = kwargs
         self.model, self.img_processor = get_model(model_key=self.model_key,
                                              usage='image_caption')
+        self.model = self.model.to(self.device)
 
     def caption(self, sample, context=True):
         # there is no image in this sample
@@ -84,7 +86,7 @@ class ImageCaptionGenerator(Generator):
 
         # 1. load image(s)
         image = load_image(sample[self.image_key])
-        inputs = self.img_processor(images=image, return_tensors="pt")
+        inputs = self.img_processor(images=image, return_tensors="pt").to(self.device)
         outputs = self.model.generate(**inputs)
         image_caption_text = self.img_processor.decode(outputs[0], skip_special_tokens=True)
         sample[GenKeys.image_caption] = image_caption_text

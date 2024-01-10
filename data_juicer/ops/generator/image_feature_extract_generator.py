@@ -1,5 +1,6 @@
 import numpy as np
 from PIL import ImageOps, Image
+import torch
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
@@ -35,8 +36,10 @@ class ImageFeatureExtractGenerator(Generator):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        self.device  = "cuda" if torch.cuda.is_available() else "cpu"
         self.model_key = prepare_model(model_type='hf_blip', model_key=hf_blip)
         self.model, self.processor = get_model(self.model_key)
+        self.model = self.model.to(self.device)
         self.transform = transforms.Compose([
                 transforms.Resize([336, 336]),
                 transforms.ToTensor()
@@ -54,7 +57,7 @@ class ImageFeatureExtractGenerator(Generator):
 
         # load images
         image = load_image(sample[self.image_key])
-        image = self.transform(image).unsqueeze(0)
+        image = self.transform(image).unsqueeze(0).to(self.device)
 
 
         # compute image embeddings
