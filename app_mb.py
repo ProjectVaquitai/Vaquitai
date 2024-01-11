@@ -6,27 +6,27 @@
 """
 import PIL
 import streamlit as st
-import src.pages.doc
-import src.pages.home
-import src.pages.data_process
-import src.pages.data_analysis
-# import src.pages.model_analysis
+import data_juicer.platform.src.pages.doc
+import data_juicer.platform.src.pages.home
+import data_juicer.platform.src.pages.data_process
+import data_juicer.platform.src.pages.data_analysis
+# import data_juicer.platform.src.pages.model_analysis
 import streamlit as st
 from streamlit_option_menu import option_menu
 
 # Page Favicon
-favicon = PIL.Image.open('src/assets/favicon.png')
+favicon = PIL.Image.open('./data_juicer/platform/src/assets/favicon.png')
 st.set_page_config(page_title='MtBuller', page_icon=favicon, layout='wide', initial_sidebar_state='auto')
 
 def main():
     # Page Title
     # Bootstrap Icons: https://icons.getbootstrap.com/
     apps = [
-        {"func": src.pages.home, "title": "首页", "icon": "house"},
-        {"func": src.pages.data_process, "title": "数据处理", "icon": "caret-right-square"},
-        {"func": src.pages.data_analysis, "title": "数据结果分析", "icon": "bar-chart-line"},
+        {"func": data_juicer.platform.src.pages.home, "title": "首页", "icon": "house"},
+        {"func": data_juicer.platform.src.pages.data_process, "title": "数据处理", "icon": "caret-right-square"},
+        {"func": data_juicer.platform.src.pages.data_analysis, "title": "数据结果分析", "icon": "bar-chart-line"},
         # {"func": src.pages.model_analysis, "title": "Model Analysis", "icon": "pie-chart"},
-        {"func": src.pages.doc, "title": "文档", "icon": "book"},
+        {"func": data_juicer.platform.src.pages.doc, "title": "文档", "icon": "book"},
     ]
 
     titles = [app["title"] for app in apps]

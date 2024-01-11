@@ -14,6 +14,7 @@ import torch.nn.functional as F
 import streamlit as st
 from data_juicer.format.load import load_formatter
 from data_juicer.utils.model_utils import get_model, prepare_model
+import base64
 
 
 @st.cache_resource
@@ -67,9 +68,9 @@ def plot_image_clusters(dataset):
     df['description'] = dataset['__dj__image_caption']
 
     marker_chart = alt.Chart(df).mark_circle().encode(
-        x='x',
-        y='y',
-        href='image:N',
+        x=alt.X('x', scale=alt.Scale(type='linear', domain=[df['x'].min() * 0.95, df['x'].max() * 1.05]), axis=alt.Axis(title='X-axis')),
+        y=alt.Y('y', scale=alt.Scale(type='linear', domain=[df['y'].min() * 0.95, df['y'].max() * 1.05]), axis=alt.Axis(title='Y-axis')),
+        href=('image:N'), 
         tooltip=['image', 'description']
     ).properties(
         width=800,
@@ -86,7 +87,7 @@ def write():
     tab_data_cleaning, tab_data_mining, tab_data_insights = st.tabs(['数据清洗', '数据挖掘', '数据洞察'])
 
     try:
-        formatter = load_formatter('./outputs/demo-process/demo-processed.jsonl')
+        formatter = load_formatter('./outputs/demo-mtbuller/demo-processed.jsonl')
         processed_dataset = formatter.load_dataset(4)
     except:
         st.warning('请先执行数据处理流程 !')
@@ -125,7 +126,7 @@ def write():
         target_data = [cnt]
         # value_data = [1 - sum(filter_nums.values()) / len(processed_dataset['image'])]
         value_data = [sum(all_conds) / len(processed_dataset['image'])]
-        labels = ['Origin', 'Retained_' + str(round(value_data[0]*100, 2)) + '%']
+        labels = ['Origin', 'Retained: ' + str(round(value_data[0]*100, 2)) + '%']
         for key, value in filter_nums.items():
             if value == 0:
                 continue
@@ -133,7 +134,7 @@ def write():
             source_data.append(0)
             target_data.append(cnt)
             value_data.append(value/len(processed_dataset[key]))
-            labels.append('Discarded_' + key + "_" + str(round(value_data[-1]*100, 2)) + '%')
+            labels.append('Discarded_' + key + ": " + str(round(value_data[-1]*100, 2)) + '%')
         
         draw_sankey_diagram(source_data, target_data, value_data, labels)
         ds = pd.DataFrame(processed_dataset)
@@ -157,7 +158,7 @@ def write():
         model, processor = load_model()
 
         # 用户输入文本框
-        input_text = st.text_input("", 'a picture of dog')
+        input_text = st.text_input("", 'a picture of horse')
 
         # 搜索按钮
         search_button = st.button("搜索", type="primary", use_container_width=True)
@@ -175,6 +176,10 @@ def write():
             #     st.image(image_path, caption='Retrieved Image', use_column_width=False)
 
     with tab_data_insights:
+        # st.markdown("<h1 style='text-align: center; font-size:25px; color: black;'>以文搜图", unsafe_allow_html=True)
+        if '__dj__image_embedding_2d' not in processed_dataset.features:
+            st.warning('请先执行数据处理流程(加入特征提取的算子) !')
+            st.stop()
         st.markdown("<h1 style='text-align: center; font-size:25px; color: black;'>数据分布可视化", unsafe_allow_html=True)
         plot = plot_image_clusters(processed_dataset)
         st.altair_chart(plot)
