@@ -1,1 +1,1 @@
-from . import pages, assets, docs, images, utils
+from . import pages, assets, docs, utils
