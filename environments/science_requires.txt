@@ -11,7 +11,8 @@ nltk
 transformers
 opencc==1.1.6
 imagededup
-torch
+torch==1.13.1
+torchvision==0.14.1
 dlib
 spacy-pkuseg==0.0.32
 cleanvision
