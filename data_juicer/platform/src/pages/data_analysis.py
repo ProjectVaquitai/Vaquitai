@@ -87,7 +87,7 @@ def write():
     tab_data_cleaning, tab_data_mining, tab_data_insights = st.tabs(['数据清洗', '数据挖掘', '数据洞察'])
 
     try:
-        formatter = load_formatter('./outputs/demo-mtbuller/demo-processed.jsonl')
+        formatter = load_formatter('./outputs/demo-gn/demo-processed.jsonl')
         processed_dataset = formatter.load_dataset(4)
     except:
         st.warning('请先执行数据处理流程 !')
