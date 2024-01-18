@@ -33,18 +33,18 @@ class ImageValidationFilter(Filter):
             return sample
 
         # there is no image in this sample
-        sample[CleaningKeys.validation] = False
+        sample[CleaningKeys.validation] = True
         if self.image_key not in sample or not sample[self.image_key]:
             return sample
 
         # load images
         loaded_image_key = sample[self.image_key]
-        sample[CleaningKeys.validation] = True
+        sample[CleaningKeys.validation] = False
 
         try:
             image = load_image(loaded_image_key)
         except:
-            sample[CleaningKeys.validation] = False
+            sample[CleaningKeys.validation] = True
             
         return sample
 
