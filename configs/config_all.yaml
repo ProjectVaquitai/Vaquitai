@@ -131,6 +131,12 @@ process:
       max_ratio: 3.0                                          # the max aspect ratio of filter range
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - image_validation_filter:
+      any_or_all: any 
+  - point_cloud_validation_filter:
+      any_or_all: any 
+  - general_file_validation_filter:
+      any_or_all: any 
+      general_file_key: general_file
   - image_brightness_filter:
       max_brightness: 200
       min_brightness: 20

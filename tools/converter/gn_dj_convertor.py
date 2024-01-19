@@ -23,7 +23,7 @@ def worker(json_path):
                 if cam['name'] == orientation:
                     img_path = "/" + cam['oss_path']
                     result['json_path'] = json_path
-                    result['image'] = img_path
+                    result['image'] = [img_path]
                     return result
     except FileNotFoundError:
         with open(cantread_path, "a") as cantread_f:

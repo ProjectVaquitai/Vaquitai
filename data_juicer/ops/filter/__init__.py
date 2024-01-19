@@ -9,6 +9,6 @@ from . import (alphanumeric_filter, average_line_length_filter,
                specified_field_filter, specified_numeric_field_filter,
                stopwords_filter, suffix_filter, text_action_filter,
                text_entity_dependency_filter, text_length_filter,
-               token_num_filter, word_num_filter, word_repetition_filter,image_brightness_filter, image_blurriness_filter, image_validation_filter)
+               token_num_filter, word_num_filter, word_repetition_filter,image_brightness_filter, image_blurriness_filter, image_validation_filter, point_cloud_validation_filter, general_file_validation_filter)
 
 # yapf: enable

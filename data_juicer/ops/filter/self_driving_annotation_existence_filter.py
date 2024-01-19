@@ -10,8 +10,8 @@ import cv2
 import numpy as np
 import os
 
-@OPERATORS.register_module('image_validation_filter')
-@LOADED_IMAGES.register_module('image_validation_filter')
+@OPERATORS.register_module('self_driving_annotation_existence_filter')
+@LOADED_IMAGES.register_module('self_driving_annotation_existence_filter')
 class ImageValidationFilter(Filter):
     """Filter to keep samples within normal validation
     """
@@ -53,7 +53,7 @@ class ImageValidationFilter(Filter):
         if CleaningKeys.validation in sample:
             return sample
 
-        sample[CleaningKeys.validation] = []
+        sample[CleaningKeys.validation] = np.array([])
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
             sample[CleaningKeys.validation] = np.array(
@@ -74,18 +74,18 @@ class ImageValidationFilter(Filter):
                     try:
                         image = load_image(loaded_image_key)
                         images[loaded_image_key] = image
-                        sample[CleaningKeys.validation].append(0)
+                        sample[CleaningKeys.validation] = np.append(sample[CleaningKeys.validation], False)
                         if context:
                             # store the image data into context
                             sample[Fields.context][loaded_image_key] = image
                     except:
-                        sample[CleaningKeys.validation].append(1)
+                        sample[CleaningKeys.validation] = np.append(sample[CleaningKeys.validation], True)
 
         return sample
         
 
     def process(self, sample):
-        validation = np.array(sample[CleaningKeys.validation])
+        validation = sample[CleaningKeys.validation]
         
         if self.any:
             return not validation.any()

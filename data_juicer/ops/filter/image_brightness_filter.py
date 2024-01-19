@@ -36,8 +36,10 @@ class ImageBrightnessFilter(Filter):
             return sample
 
         # there is no image in this sample
-        sample[CleaningKeys.brightness] = ''
+        sample[CleaningKeys.brightness] = []
         if self.image_key not in sample or not sample[self.image_key]:
+            sample[CleaningKeys.validation] = np.array(
+                [], dtype=np.int64)
             return sample
 
         # load images
