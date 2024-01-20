@@ -5,17 +5,27 @@ from tqdm import tqdm
 from multiprocessing.pool import ThreadPool
 import random
 import jsonlines
+<<<<<<< HEAD
 from datetime import datetime
+=======
+>>>>>>> ee10829... [Feature] Add point cloud key & Add point cloud validation op
 
 orientation = "front_middle_camera"
 parquet_file_path = '/mnt/ve_share/chenminghua/dataset/icu30_2d_3d_key_point_clip.parquet'
 df = pd.read_parquet(parquet_file_path)
 usable_df = df[df["sensor_name"] == orientation]
 print(usable_df)
+<<<<<<< HEAD
 annotations = random.sample(["/" + _ for _ in set(usable_df["annotation_path"])], 10000)
 # annotations = ["/" + _ for _ in set(usable_df["annotation_path"])]
 cantread_path = "./demos/data_gn6/cantread.txt"
 result_path = "./demos/data_gn6/gn_10k.jsonl"
+=======
+# annotations = random.sample(["/" + _ for _ in set(usable_df["annotation_path"])], 10000)
+annotations = ["/" + _ for _ in set(usable_df["annotation_path"])]
+cantread_path = "./demos/data_gn6/cantread.txt"
+result_path = "./demos/data_gn6/gn_all.jsonl"
+>>>>>>> ee10829... [Feature] Add point cloud key & Add point cloud validation op
 
 def worker(json_path):
     try:

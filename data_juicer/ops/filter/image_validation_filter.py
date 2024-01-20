@@ -74,12 +74,12 @@ class ImageValidationFilter(Filter):
                     try:
                         image = load_image(loaded_image_key)
                         images[loaded_image_key] = image
-                        sample[CleaningKeys.validation].append(False)
+                        sample[CleaningKeys.validation].append(0)
                         if context:
                             # store the image data into context
                             sample[Fields.context][loaded_image_key] = image
                     except:
-                        sample[CleaningKeys.validation].append(True)
+                        sample[CleaningKeys.validation].append(1)
 
         return sample
         
