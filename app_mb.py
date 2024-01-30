@@ -26,6 +26,8 @@ st.set_page_config(
 # Read authentication configuration
 with open('configs/authenticator.yaml') as file:
     config = yaml.load(file, Loader=yaml.SafeLoader)
+    print('=============')
+    print(config)
 
 authenticator = stauth.Authenticate(
     config['credentials'],
@@ -49,7 +51,7 @@ def main():
     titles_lower = [title.lower() for title in titles]
     icons = [app["icon"] for app in apps]
 
-    params = st.experimental_get_query_params()
+    params = st.query_params
     default_index = titles_lower.index(params.get("page", [titles[0].lower()])[0].lower())
 
     with st.sidebar:

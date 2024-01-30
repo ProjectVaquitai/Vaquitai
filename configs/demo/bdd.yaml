@@ -1,0 +1,21 @@
+# Process config example for dataset
+
+# global parameters
+project_name: 'demo-bdd'
+dataset_path: './demos/data_bdd/bdd.jsonl'  # path to your dataset directory or file
+np: 112  # number of subprocess to process your dataset
+
+export_path: './outputs/demo-bdd/demo-bdd.jsonl'
+# keep_hashes_in_res_ds: True
+# keep_cleaning_stas_in_res_ds: True
+# process schedule
+# a list of several process operators with their arguments
+process:
+  - image_validation_filter:
+  - cleanvision_mycleanlab:
+  - image_deduplicator:
+  # - image_brightness_filter:
+  # - image_blurriness_filter:
+  # - image_feature_extract_generator:                                # extract embeddings for images 
+  # - image_caption_generator:
+  # - feature_reduce_generator:  

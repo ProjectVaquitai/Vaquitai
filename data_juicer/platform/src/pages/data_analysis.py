@@ -32,6 +32,12 @@ def load_model():
     return model, processor
 
 @st.cache_resource
+def load_dataset(data_path):
+    formatter = load_formatter(data_path)
+    processed_dataset = formatter.load_dataset(4)
+    return processed_dataset
+
+@st.cache_resource
 def create_faiss_index(emb_list):
     image_embeddings = np.array(emb_list).astype('float32')
     faiss_index = faiss.IndexFlatL2(image_embeddings.shape[1])
@@ -97,8 +103,7 @@ def write():
                 ], default="data_show")
 
     try:
-        formatter = load_formatter('/mnt/ve_share/chenminghua/data-juicer/outputs/demo-mtbuller/demo-processed.jsonl')
-        processed_dataset = formatter.load_dataset(4)
+        processed_dataset = load_dataset('/root/project/demo_dataset/demo-mtbuller/demo-processed.jsonl')  
     except:
         st.warning('请先执行数据处理流程 !')
         st.stop()
@@ -165,8 +170,29 @@ def write():
                            file_name='discarded.jsonl')
 
     elif chosen_id == 'data_mining':
+        html_code = """
+            <style>
+            .responsive-iframe-container {
+                position: relative;
+                overflow: hidden;
+                padding-top: 56.25%; /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+            }
+            .responsive-iframe-container iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+            </style>
+            <div class="responsive-iframe-container">
+            <iframe src="http://datacentric.club:8501/" allowfullscreen></iframe>
+            </div>
+            """
         # st.markdown("<h1 style='text-align: center; font-size:25px; color: black;'>以文搜图", unsafe_allow_html=True)
-        st.markdown('<iframe src="http://datacentric.club" width="1000" height="600"></iframe>', unsafe_allow_html=True)
+        st.markdown(html_code, unsafe_allow_html=True)
+
+        # st.markdown('<iframe src="http://0.0.0.0:8501" width="1000" height="600"></iframe>', unsafe_allow_html=True)
         # if '__dj__image_embedding_2d' not in processed_dataset.features:
         #     st.warning('请先执行数据处理流程(加入特征提取的算子) !')
         #     st.stop()
@@ -217,6 +243,7 @@ def write():
        
         if analysis_button:
             st.markdown('<iframe src="http://datacentric.club:3000/" width="1000" height="500"></iframe>', unsafe_allow_html=True)
+            # st.markdown('<iframe src="http://datacentric.club:3000/" width="600" height="500"></iframe>', unsafe_allow_html=True)
             html_save_path = os.path.join('frontend', st.session_state['username'], \
                                           selected_dataset_1 + '_vs_' + selected_dataset_2 + '_EDA.html')
             shutil.os.makedirs(Path(html_save_path).parent, exist_ok=True)

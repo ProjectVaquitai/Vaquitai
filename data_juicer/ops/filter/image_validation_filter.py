@@ -35,62 +35,67 @@ class ImageValidationFilter(Filter):
 
     def compute_stats(self, sample, context=False):
 
-        # # there is no image in this sample
-        # sample[CleaningKeys.validation] = True
-        # if self.image_key not in sample or not sample[self.image_key]:
-        #     return sample
+        if self.image_key == "image":
+            # there is no image in this sample
+            sample[CleaningKeys.validation] = True
+            if self.image_key not in sample or not sample[self.image_key]:
+                return sample
 
-        # # load images
-        # loaded_image_key = sample[self.image_key]
-        # sample[CleaningKeys.validation] = False
+            # load images
+            loaded_image_key = sample[self.image_key]
+            sample[CleaningKeys.validation] = False
 
-        # try:
-        #     image = load_image(loaded_image_key)
-        # except:
-        #     sample[CleaningKeys.validation] = True
-            
-        # check if it's computed already
-        if CleaningKeys.validation in sample:
-            return sample
+            try:
+                image = load_image(loaded_image_key)
+            except:
+                sample[CleaningKeys.validation] = True
+        
+        elif self.image_key == "images":
+            # check if it's computed already
+            if CleaningKeys.validation in sample:
+                return sample
 
-        sample[CleaningKeys.validation] = []
-        # there is no image in this sample
-        if self.image_key not in sample or not sample[self.image_key]:
-            sample[CleaningKeys.validation] = np.array(
-                [], dtype=np.int64)
-            return sample
+            sample[CleaningKeys.validation] = []
+            # there is no image in this sample
+            if self.image_key not in sample or not sample[self.image_key]:
+                sample[CleaningKeys.validation] = np.array(
+                    [], dtype=np.int64)
+                return sample
 
-        # load images
-        loaded_image_keys = sample[self.image_key]
-        images = {}
-        for loaded_image_key in loaded_image_keys:
-            if context and loaded_image_key in sample[Fields.context]:
-                # load from context
-                images[loaded_image_key] = sample[
-                    Fields.context][loaded_image_key]
-            else:
-                if loaded_image_key not in images:
-                    # avoid load the same images
-                    try:
-                        image = load_image(loaded_image_key)
-                        images[loaded_image_key] = image
-                        sample[CleaningKeys.validation].append(0)
-                        if context:
-                            # store the image data into context
-                            sample[Fields.context][loaded_image_key] = image
-                    except:
-                        sample[CleaningKeys.validation].append(1)
+            # load images
+            loaded_image_keys = sample[self.image_key]
+            images = {}
+            for loaded_image_key in loaded_image_keys:
+                if context and loaded_image_key in sample[Fields.context]:
+                    # load from context
+                    images[loaded_image_key] = sample[
+                        Fields.context][loaded_image_key]
+                else:
+                    if loaded_image_key not in images:
+                        # avoid load the same images
+                        try:
+                            image = load_image(loaded_image_key)
+                            images[loaded_image_key] = image
+                            sample[CleaningKeys.validation].append(0)
+                            if context:
+                                # store the image data into context
+                                sample[Fields.context][loaded_image_key] = image
+                        except:
+                            sample[CleaningKeys.validation].append(1)
 
         return sample
         
 
     def process(self, sample):
-        validation = np.array(sample[CleaningKeys.validation])
+        if self.image_key == "image":
+            return not sample[CleaningKeys.validation] 
         
-        if self.any:
-            return not validation.any()
-        else:
-            return not validation.all()
+        elif self.image_key == "images":
+            validation = np.array(sample[CleaningKeys.validation])
+            
+            if self.any:
+                return not validation.any()
+            else:
+                return not validation.all()
         
-        # return not validation
             
