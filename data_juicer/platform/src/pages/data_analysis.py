@@ -104,7 +104,7 @@ def write():
                 ], default="data_show")
 
     try:
-        processed_dataset = load_dataset('/mnt/share_disk/songyuhao/data/data_cleaning/bdd_anno.jsonl')  
+        processed_dataset = load_dataset('/root/dataset/bdd_anno.jsonl')  
         # processed_dataset = pd.DataFrame(processed_dataset)
     except:
         st.warning('请先执行数据处理流程 !')

@@ -26,8 +26,6 @@ st.set_page_config(
 # Read authentication configuration
 with open('configs/authenticator.yaml') as file:
     config = yaml.load(file, Loader=yaml.SafeLoader)
-    print('=============')
-    print(config)
 
 authenticator = stauth.Authenticate(
     config['credentials'],
@@ -86,7 +84,6 @@ if __name__ == '__main__':
             'Login': 'Login'
         }
     )
-    print(name, authentication_status, username)
     
     # Execute the main program based on the authentication status
     if st.session_state["authentication_status"]:
