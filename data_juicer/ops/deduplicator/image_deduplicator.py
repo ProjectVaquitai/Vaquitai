@@ -106,34 +106,40 @@ class ImageDeduplicator(Deduplicator):
             return dataset, {}
 
         dup_hashes = None
-        if show_num > 0:
-            # sample duplicate pairs
-            hash2ids: Dict[int, Set[int]] = defaultdict(set)
-            for sid, hash_val in enumerate(dataset[HashKeys.imagehash]):
-                if hash_val:
-                    hash2ids[hash_val].add(sid)
-            dup_samples = sorted(list(hash2ids.items()),
-                                 key=lambda x: len(x[1]),
-                                 reverse=True)
-            dup_hashes = set([
-                item[0] for item in dup_samples if len(item[1]) > 1
-            ][:show_num])
+        # if show_num > 0:
+        # sample duplicate pairs
+        hash2ids: Dict[int, Set[int]] = defaultdict(set)
+        for sid, hash_val in enumerate(dataset[HashKeys.imagehash]):
+            if hash_val:
+                hash2ids[hash_val].add(sid)
+        dup_samples = sorted(list(hash2ids.items()),
+                                key=lambda x: len(x[1]),
+                                reverse=True)
+        dup_hashes = set([
+            item[0] for item in dup_samples if len(item[1]) > 1
+        ])
         
-        def _map_dup_helper(sample, hashes):
+        def _map_dup_helper(sample, hashes, dup_pairs):
             ##### exact match #####
             hash = sample[HashKeys.imagehash]
             if not hash:
+                # sample[CleaningKeys.image_duplicated_pairs] = []
+                sample[CleaningKeys.image_duplicated_pairs] = dup_pairs.get(hash)
                 return sample
-            if show_num > 0 and hash in dup_hashes \
-                    and len(dup_pairs[hash]) < 2:
+            # if show_num > 0 and hash in dup_hashes \
+            #         and len(dup_pairs[hash]) < 2:
+            if hash in dup_hashes:
                 # tracer is open and not enough duplicate sample pairs
-                dup_pairs[hash].append(sample)
+                dup_pairs[hash].append(sample[self.image_key])
             if hash in hashes:
                 sample[CleaningKeys.image_duplicated] = True
+                sample[CleaningKeys.image_duplicated_pairs] = dup_pairs.get(hash)
                 return sample
             else:
                 hashes.add(hash)
                 sample[CleaningKeys.image_duplicated] = False
+                sample[CleaningKeys.image_duplicated_pairs] = dup_pairs.get(hash)
+                # sample[CleaningKeys.image_duplicated_pairs] = []
                 return sample
 
         # def _filter_dup_helper(sample, hashes):
@@ -152,6 +158,7 @@ class ImageDeduplicator(Deduplicator):
 
         hashes = set()
         dup_pairs = {hash_v: [] for hash_v in dup_hashes} if dup_hashes else {}
+        # print(dup_pairs)
         # dataset = dataset.filter(
         #     _filter_dup_helper,
         #     fn_kwargs=dict(hashes=hashes),
@@ -159,6 +166,6 @@ class ImageDeduplicator(Deduplicator):
         
         dataset = dataset.map(
             _map_dup_helper,
-            fn_kwargs=dict(hashes=hashes),
+            fn_kwargs=dict(hashes=hashes, dup_pairs=dup_pairs),
             load_from_cache_file=False if show_num > 0 else True)  # num_proc=1
         return dataset, dup_pairs

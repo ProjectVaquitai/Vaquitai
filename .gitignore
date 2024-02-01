@@ -20,3 +20,4 @@ demos/data_gn*
 demos/data_bdd
 .vscode
 nohup.out
+frontend/

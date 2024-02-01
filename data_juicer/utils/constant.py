@@ -147,6 +147,7 @@ class HashKeys(object):
 class CleaningKeys(object):
     # image
     image_duplicated = DEFAULT_PREFIX + 'is_image_duplicated_issue'
+    image_duplicated_pairs = DEFAULT_PREFIX + "duplicated_pairs"
     brightness = DEFAULT_PREFIX + 'brightness'
     cv2_dark_label = DEFAULT_PREFIX + 'is_cv2_dark_issue'
     cv2_light_label = DEFAULT_PREFIX + 'is_cv2_light_issue'

@@ -176,8 +176,6 @@ class Executor:
                     if self.cfg.use_checkpoint:
                         prev = dataset
                     tmp = op.process(dataset, num_proc=self.cfg.np)
-                    if self.open_tracer and op_name in self.op_list_to_trace:
-                        self.tracer.trace_deduplicator(op_name, dup_pairs)
                 else:
                     raise NotImplementedError
                 dataset = tmp

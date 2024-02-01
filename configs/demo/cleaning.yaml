@@ -2,7 +2,7 @@
 
 # global parameters
 project_name: 'demo-cleaning'
-dataset_path: './demos/data_image/cifar10_data_dup_images.jsonl'  # path to your dataset directory or file
+dataset_path: './demos/data_image/cifar10_data_dup_2.jsonl'  # path to your dataset directory or file
 np: 112  # number of subprocess to process your dataset
 
 export_path: './outputs/demo-cleaning/demo-cleaning.jsonl'
@@ -11,9 +11,9 @@ export_path: './outputs/demo-cleaning/demo-cleaning.jsonl'
 # process schedule
 # a list of several process operators with their arguments
 process:
-  - image_validation_filter:
+  # - image_validation_filter:
   # - cleanvision_mycleanlab:
-  # - image_deduplicator:
+  - image_deduplicator:
   # - image_brightness_filter:
   # - image_blurriness_filter:
   # - image_feature_extract_generator:                                # extract embeddings for images 

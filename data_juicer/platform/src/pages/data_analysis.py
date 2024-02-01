@@ -22,7 +22,8 @@ from pathlib import Path
 from PIL import Image
 from data_juicer.format.load import load_formatter
 from data_juicer.utils.model_utils import get_model, prepare_model
-
+from data_juicer.utils.vis import plot_dup_images
+import random
 
 
 @st.cache_resource
@@ -103,28 +104,46 @@ def write():
                 ], default="data_show")
 
     try:
-        processed_dataset = load_dataset('/root/project/demo_dataset/demo-mtbuller/demo-processed.jsonl')  
+        processed_dataset = load_dataset('/mnt/share_disk/songyuhao/data/data_cleaning/bdd_anno.jsonl')  
+        # processed_dataset = pd.DataFrame(processed_dataset)
     except:
         st.warning('请先执行数据处理流程 !')
         st.stop()
 
     # TODO: Automatically find data source
     data_source = ['BDD100K-train', 'BDD100K-val', 'BDD100K-test']
+    issue_dict = {'重复': '__dj__is_image_duplicated_issue',
+                '低信息': '__dj__is_low_information_issue',                 
+                '特殊大小': '__dj__is_odd_size_issue', 
+                '特殊尺寸': '__dj__is_odd_aspect_ratio_issue',
+                '极亮': '__dj__is_light_issue',
+                '灰度': '__dj__is_grayscale_issue', 
+                '极暗': '__dj__is_dark_issue', 
+                '模糊': '__dj__is_blurry_issue'}
+    
+    def find_key_by_value(dictionary, target_value):
+        for key, value in dictionary.items():
+            if value == target_value:
+                return key
+        return None
 
     if chosen_id == 'data_show':
         category = st.selectbox("选择数据类型", data_source)
 
     if chosen_id == 'data_cleaning':
+        dc_df = processed_dataset.remove_columns(["attributes", "labels"])
         category = st.selectbox("选择数据类型", data_source)
         filter_nums = {}
         # iterate over the dataset to count the number of samples that are discarded
-        all_conds = np.ones(len(processed_dataset['image']), dtype=bool)
-        for key in processed_dataset.features:
+        all_conds = np.ones(len(dc_df['image']), dtype=bool)
+        for key in dc_df.features:
             if 'issue' not in key:
                 continue
-            all_conds = all_conds & (np.array(processed_dataset[key]) == False)
-            filter_nums[key] = sum(np.array(processed_dataset[key]) == True)
+            all_conds = all_conds & (np.array(dc_df[key]) == False)
+            filter_nums[key] = sum(np.array(dc_df[key]) == True)
 
+        @st.cache_data
+        @st.cache_resource
         def draw_sankey_diagram(source_data, target_data, value_data, labels):
             fig = go.Figure(data=[go.Sankey(
                 node=dict(
@@ -145,8 +164,8 @@ def write():
         cnt = 1
         source_data = [0]
         target_data = [cnt]
-        # value_data = [1 - sum(filter_nums.values()) / len(processed_dataset['image'])]
-        value_data = [sum(all_conds) / len(processed_dataset['image'])]
+        # value_data = [1 - sum(filter_nums.values()) / len(dc_df['image'])]
+        value_data = [sum(all_conds) / len(dc_df['image'])]
         labels = ['Origin', 'Retained: ' + str(round(value_data[0]*100, 2)) + '%']
         for key, value in filter_nums.items():
             if value == 0:
@@ -154,20 +173,53 @@ def write():
             cnt += 1
             source_data.append(0)
             target_data.append(cnt)
-            value_data.append(value/len(processed_dataset[key]))
-            labels.append('Discarded_' + key + ": " + str(round(value_data[-1]*100, 2)) + '%')
+            value_data.append(value/len(dc_df[key]))
+            labels.append(find_key_by_value(issue_dict, key) + ": " + str(round(value_data[-1]*100, 2)) + '%')
         
         draw_sankey_diagram(source_data, target_data, value_data, labels)
-        ds = pd.DataFrame(processed_dataset)
-        # all_conds = np.ones(len(ds.index), dtype=bool)
-        display_dataset(ds, all_conds, 10, 'Retained sampels', 'images')
-        st.download_button('Download Retained data as JSONL',
-                           data=convert_to_jsonl(ds.loc[all_conds]),
-                           file_name='retained.jsonl')
-        display_dataset(ds, np.invert(all_conds), 10, 'Discarded sampels', 'images')
-        st.download_button('Download Discarded data as JSONL',
-                           data=convert_to_jsonl(ds.loc[np.invert(all_conds)]),
-                           file_name='discarded.jsonl')
+        
+        cat_issue_dict = {}
+        for key, value in issue_dict.items():
+            if filter_nums[value] > 0:
+                cat_issue_dict[key] = value
+        
+        images_per_col = 3
+        category_issue = st.selectbox("选择错误类型", list(cat_issue_dict.keys()))
+        amount = st.slider("展示数量", min_value=1, max_value=10, value=3, step=1)
+        if st.button("点击展示随机图像"):
+            print(type(dc_df))
+            print(dc_df)
+            # selected_issues = dc_df[dc_df[issue_dict[category_issue]] == True]
+            selected_issues = dc_df.filter(lambda example: example[issue_dict[category_issue]] == True)
+            # selected_rows = selected_issues.sample(min(amount, len(selected_issues)))
+            # selected_rows = selected_issues.sample(seed=42).select([0, 1, 2, 3, 4])
+            print("a", type(selected_issues))
+            print("b", selected_issues)
+            selected_rows = selected_issues.shuffle()[:amount]
+            print("c", selected_rows)
+            if category_issue != '重复':
+                random_images = selected_rows['image']
+                for i in range(0, len(random_images), images_per_col):
+                    cols = st.columns(images_per_col)
+                    for col, img_url in zip(cols, random_images[i:i+images_per_col]):
+                        col.image(img_url, use_column_width=True)
+            else:
+                ori_images = selected_rows['image']
+                dup_images = selected_rows['__dj__duplicated_pairs']
+                for i in range(0, len(ori_images), images_per_col):
+                    cols = st.columns(images_per_col)
+                    for col, ori_img, dup_imgs in zip(cols, ori_images[i:i+images_per_col], dup_images[i:i+images_per_col]):
+                        display_image = plot_dup_images(ori_img, dup_imgs)
+                        col.pyplot(display_image)              
+                    
+        # display_dataset(ds, all_conds, 10, 'Retained sampels', 'images')
+        # st.download_button('Download Retained data as JSONL',
+        #                    data=convert_to_jsonl(ds.loc[all_conds]),
+        #                    file_name='retained.jsonl')
+        # display_dataset(ds, np.invert(all_conds), 10, 'Discarded sampels', 'images')
+        # st.download_button('Download Discarded data as JSONL',
+        #                    data=convert_to_jsonl(ds.loc[np.invert(all_conds)]),
+        #                    file_name='discarded.jsonl')
 
     elif chosen_id == 'data_mining':
         html_code = """
@@ -220,8 +272,7 @@ def write():
 
     elif chosen_id == 'data_insights':
         col1, col2, col3 = st.columns(3)
-        compare_features = ['image',  '__dj__is_cv2_blurriness_issue', '__dj__is_cv2_dark_issue', \
-                        '__dj__is_cv2_light_issue', '__dj__is_image_duplicated_issue', \
+        compare_features = ['image', '__dj__is_image_duplicated_issue', \
                         '__dj__is_odd_size_issue', '__dj__is_odd_aspect_ratio_issue',\
                         '__dj__is_low_information_issue', '__dj__is_light_issue',\
                         '__dj__is_grayscale_issue', '__dj__is_dark_issue', '__dj__is_blurry_issue']

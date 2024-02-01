@@ -1,11 +1,14 @@
 # Process config example for dataset
 
 # global parameters
-project_name: 'demo-bdd'
-dataset_path: './demos/data_bdd/bdd.jsonl'  # path to your dataset directory or file
+project_name: 'demo-bdd-anno'
+dataset_path: './demos/data_bdd/bdd_anno.jsonl'  # path to your dataset directory or file
 np: 112  # number of subprocess to process your dataset
+# open_tracer: True
+# op_list_to_trace: ["image_deduplicator"]
 
-export_path: './outputs/demo-bdd/demo-bdd.jsonl'
+
+export_path: './outputs/demo-bdd/demo-bdd-anno.jsonl'
 # keep_hashes_in_res_ds: True
 # keep_cleaning_stas_in_res_ds: True
 # process schedule
