@@ -8,7 +8,7 @@ np: 112  # number of subprocess to process your dataset
 # op_list_to_trace: ["image_deduplicator"]
 
 
-export_path: './outputs/demo-bdd/demo-bdd-anno.jsonl'
+export_path: './outputs/demo-bdd/demo-bdd-anno-2.jsonl'
 # keep_hashes_in_res_ds: True
 # keep_cleaning_stas_in_res_ds: True
 # process schedule

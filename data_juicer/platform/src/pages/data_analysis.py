@@ -8,6 +8,7 @@
 import os
 import shutil
 import base64
+import time
 import numpy as np
 import pandas as pd
 import faiss
@@ -45,15 +46,25 @@ def create_faiss_index(emb_list):
     faiss_index.add(image_embeddings)
     return faiss_index
 
-def display_dataset(dataframe, cond, show_num, desp, type, all=True):
-    examples = dataframe.loc[cond]
+def display_dataset(dataset, cond, show_num, desp, type, all=True):
+    # examples = dataframe.loc[cond]
+    # if all or len(examples) > 0:
+    #     st.subheader(
+    #         f'{desp}: :red[{len(examples)}] of '
+    #         f'{len(dataframe.index)} {type} '
+    #         f'(:red[{len(examples)/len(dataframe.index) * 100:.2f}%])')
+
+    #     st.dataframe(examples[:show_num], use_container_width=True)
+    
+    examples = dataset.select(np.where(cond)[0])
+    # examples = dataset.loc[cond]
     if all or len(examples) > 0:
         st.subheader(
             f'{desp}: :red[{len(examples)}] of '
-            f'{len(dataframe.index)} {type} '
-            f'(:red[{len(examples)/len(dataframe.index) * 100:.2f}%])')
-
-        st.dataframe(examples[:show_num], use_container_width=True)
+            f'{len(dataset)} {type} '
+            f'(:red[{len(examples)/len(dataset) * 100:.2f}%])')
+        dataframe = pd.DataFrame(examples)
+        st.write(dataframe[:show_num])
 
 
 def display_image_grid(urls, cols=3, width=300):
@@ -71,7 +82,7 @@ def display_image_grid(urls, cols=3, width=300):
     st.image(image_grid, channels="RGB")
 
 
-@st.cache_data
+# @st.cache_data
 def convert_to_jsonl(df):
     return df.to_json(orient='records', lines=True, force_ascii=False).encode('utf_8_sig')
 
@@ -104,14 +115,14 @@ def write():
                 ], default="data_show")
 
     try:
-        processed_dataset = load_dataset('/root/dataset/bdd_anno.jsonl')  
+        processed_dataset = load_dataset('/mnt/share_disk/LIV/data_centric/demo-bdd-anno.jsonl')  
         # processed_dataset = pd.DataFrame(processed_dataset)
     except:
         st.warning('请先执行数据处理流程 !')
         st.stop()
 
     # TODO: Automatically find data source
-    data_source = ['BDD100K-train', 'BDD100K-val', 'BDD100K-test']
+    data_source = {'BDD100K-train': 'train', 'BDD100K-val': 'val', 'BDD100K-test': 'test'}
     issue_dict = {'重复': '__dj__is_image_duplicated_issue',
                 '低信息': '__dj__is_low_information_issue',                 
                 '特殊大小': '__dj__is_odd_size_issue', 
@@ -128,23 +139,52 @@ def write():
         return None
 
     if chosen_id == 'data_show':
-        category = st.selectbox("选择数据类型", data_source)
+        html_code = """
+            <style>
+            .responsive-iframe-container {
+                position: relative;
+                overflow: hidden;
+                padding-top: 56.25%; /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+            }
+            .responsive-iframe-container iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+            </style>
+            <div class="responsive-iframe-container">
+            <iframe src="http://datacentric.club:8050/" allowfullscreen></iframe>
+            </div>
+            """
+        # st.markdown("<h1 style='text-align: center; font-size:25px; color: black;'>以文搜图", unsafe_allow_html=True)
+        st.markdown(html_code, unsafe_allow_html=True)
+        
 
     if chosen_id == 'data_cleaning':
+        t0 = time.time()
         dc_df = processed_dataset.remove_columns(["attributes", "labels"])
-        category = st.selectbox("选择数据类型", data_source)
+        category = st.selectbox("选择数据类型", list(data_source.keys()))
+        dc_df = dc_df.filter(lambda example: example['data_source'] == data_source[category])
         filter_nums = {}
         # iterate over the dataset to count the number of samples that are discarded
         all_conds = np.ones(len(dc_df['image']), dtype=bool)
+        print("ori all conds: ", all_conds)
         for key in dc_df.features:
             if 'issue' not in key:
                 continue
             all_conds = all_conds & (np.array(dc_df[key]) == False)
             filter_nums[key] = sum(np.array(dc_df[key]) == True)
-
+        print('----------------------',time.time() - t0)
         @st.cache_data
         @st.cache_resource
         def draw_sankey_diagram(source_data, target_data, value_data, labels):
+            """https://plotly.com/python/sankey-diagram/"""
+            print(source_data)
+            print(target_data)
+            print(value_data)
+            print(labels)
             fig = go.Figure(data=[go.Sankey(
                 node=dict(
                     pad=15,
@@ -161,17 +201,18 @@ def write():
             fig.update_layout(title_text="数据清洗比例统计", title_font=dict(size=25), font_size=16)
             st.plotly_chart(fig)
 
-        cnt = 1
-        source_data = [0]
-        target_data = [cnt]
+        cnt = 2
+        source_data = [0, 0]
+        target_data = [cnt - 1, cnt]
         # value_data = [1 - sum(filter_nums.values()) / len(dc_df['image'])]
         value_data = [sum(all_conds) / len(dc_df['image'])]
-        labels = ['Origin', 'Retained: ' + str(round(value_data[0]*100, 2)) + '%']
+        value_data.append(1 - value_data[0])
+        labels = ['原始数据', '保留: ' + str(round(value_data[0]*100, 2)) + '%', '问题数据: ' + str(round(value_data[1]*100, 2)) + '%']
         for key, value in filter_nums.items():
             if value == 0:
                 continue
             cnt += 1
-            source_data.append(0)
+            source_data.append(2)
             target_data.append(cnt)
             value_data.append(value/len(dc_df[key]))
             labels.append(find_key_by_value(issue_dict, key) + ": " + str(round(value_data[-1]*100, 2)) + '%')
@@ -184,19 +225,24 @@ def write():
                 cat_issue_dict[key] = value
         
         images_per_col = 3
+        st.text("")
+        st.markdown("""
+                    <style>
+                    .big-font {
+                        font-size:25px !important;
+                    }
+                    </style>
+                    """, unsafe_allow_html=True)
+        st.markdown('<p class="big-font">数据清洗结果展示</p>', unsafe_allow_html=True)
         category_issue = st.selectbox("选择错误类型", list(cat_issue_dict.keys()))
-        amount = st.slider("展示数量", min_value=1, max_value=10, value=3, step=1)
-        if st.button("点击展示随机图像"):
-            print(type(dc_df))
-            print(dc_df)
+        # amount = st.slider("展示数量", min_value=1, max_value=10, value=3, step=1)
+        amount = 3
+        if category_issue:
             # selected_issues = dc_df[dc_df[issue_dict[category_issue]] == True]
             selected_issues = dc_df.filter(lambda example: example[issue_dict[category_issue]] == True)
             # selected_rows = selected_issues.sample(min(amount, len(selected_issues)))
             # selected_rows = selected_issues.sample(seed=42).select([0, 1, 2, 3, 4])
-            print("a", type(selected_issues))
-            print("b", selected_issues)
             selected_rows = selected_issues.shuffle()[:amount]
-            print("c", selected_rows)
             if category_issue != '重复':
                 random_images = selected_rows['image']
                 for i in range(0, len(random_images), images_per_col):
@@ -211,15 +257,17 @@ def write():
                     for col, ori_img, dup_imgs in zip(cols, ori_images[i:i+images_per_col], dup_images[i:i+images_per_col]):
                         display_image = plot_dup_images(ori_img, dup_imgs)
                         col.pyplot(display_image)              
-                    
-        # display_dataset(ds, all_conds, 10, 'Retained sampels', 'images')
-        # st.download_button('Download Retained data as JSONL',
-        #                    data=convert_to_jsonl(ds.loc[all_conds]),
-        #                    file_name='retained.jsonl')
-        # display_dataset(ds, np.invert(all_conds), 10, 'Discarded sampels', 'images')
-        # st.download_button('Download Discarded data as JSONL',
-        #                    data=convert_to_jsonl(ds.loc[np.invert(all_conds)]),
-        #                    file_name='discarded.jsonl')
+        
+        print(all_conds)
+        display_dataset(dc_df, all_conds, 10, 'Retained sampels', 'images')
+        import json
+        st.download_button('Download Retained data as JSONL',
+                           data=convert_to_jsonl(dc_df.select(np.where(all_conds)[0]).to_pandas()),
+                           file_name='retained.jsonl')
+        display_dataset(dc_df, np.invert(all_conds), 10, 'Discarded sampels', 'images')
+        st.download_button('Download Discarded data as JSONL',
+                           data=convert_to_jsonl(dc_df.select(np.where(np.invert(all_conds))[0]).to_pandas()),
+                           file_name='discarded.jsonl')
 
     elif chosen_id == 'data_mining':
         html_code = """
@@ -242,7 +290,8 @@ def write():
             </div>
             """
         # st.markdown("<h1 style='text-align: center; font-size:25px; color: black;'>以文搜图", unsafe_allow_html=True)
-        st.markdown(html_code, unsafe_allow_html=True)
+        # st.markdown(html_code, unsafe_allow_html=True)
+        st.markdown('<iframe src="http://datacentric.club:8501/" width="1000" height="500"></iframe>', unsafe_allow_html=True)
 
         # st.markdown('<iframe src="http://0.0.0.0:8501" width="1000" height="600"></iframe>', unsafe_allow_html=True)
         # if '__dj__image_embedding_2d' not in processed_dataset.features:
@@ -272,36 +321,42 @@ def write():
 
     elif chosen_id == 'data_insights':
         col1, col2, col3 = st.columns(3)
-        compare_features = ['image', '__dj__is_image_duplicated_issue', \
+        compare_features = ['attributes.weather', 'attributes.scene', 'attributes.timeofday', \
+                        'labels.car', 'labels.person', '__dj__is_image_duplicated_issue', \
                         '__dj__is_odd_size_issue', '__dj__is_odd_aspect_ratio_issue',\
                         '__dj__is_low_information_issue', '__dj__is_light_issue',\
                         '__dj__is_grayscale_issue', '__dj__is_dark_issue', '__dj__is_blurry_issue']
 
         with col1:
-            selected_dataset_1 = st.selectbox('选择数据集1', data_source)
+            category_1 = st.selectbox('选择数据集1', list(data_source.keys()))
 
         with col2:
-            selected_dataset_2 = st.selectbox('选择数据集2', ['None'] + data_source)
+            category_2 = st.selectbox('选择数据集2', ['None'] + list(data_source.keys()))
 
         with col3:
             st.write(' ')
             analysis_button = st.button("开始分析数据", type="primary", use_container_width=False)
 
-        df1 = processed_dataset.to_pandas()[compare_features]
+        # df1 = processed_dataset.to_pandas()[compare_features]
+        dc_df = processed_dataset.filter(lambda example: example['data_source'] == data_source[category_1])
+        df1 = dc_df.flatten().to_pandas()[compare_features]
 
-        if selected_dataset_2 != 'None':
-            df2 = processed_dataset.to_pandas()[compare_features]
+        if category_2 != 'None':
+            # df2 = processed_dataset.to_pandas()[compare_features]
+            dc_df = processed_dataset.filter(lambda example: example['data_source'] == data_source[category_2])
+            df2 = dc_df.flatten().to_pandas()[compare_features]
+
        
         if analysis_button:
             st.markdown('<iframe src="http://datacentric.club:3000/" width="1000" height="500"></iframe>', unsafe_allow_html=True)
             # st.markdown('<iframe src="http://datacentric.club:3000/" width="600" height="500"></iframe>', unsafe_allow_html=True)
             html_save_path = os.path.join('frontend', st.session_state['username'], \
-                                          selected_dataset_1 + '_vs_' + selected_dataset_2 + '_EDA.html')
+                                          category_1 + '_vs_' + category_2 + '_EDA.html')
             shutil.os.makedirs(Path(html_save_path).parent, exist_ok=True)
             with st.expander('数据集对比分析', expanded=True):
                 if not os.path.exists(html_save_path ):
                     with st.spinner('Wait for process...'):
-                        if selected_dataset_2 == 'None':
+                        if category_2 == 'None':
                             report = sv.analyze(df1)
                         else:
                             report = sv.compare(df1, df2)
