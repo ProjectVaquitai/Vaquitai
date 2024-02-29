@@ -4,11 +4,12 @@
 :LastEditTime: 2023-02-19 15:05:04
 :Description: 
 """
-
+from loguru import logger
 import streamlit as st
-import data_juicer.platform.src.utils.st_components as st_components
+from data_juicer.platform.src.utils.st_components import get_remote_ip
 
 def write():
+    logger.info(f"enter doc page, user_name: {st.session_state['name']}, ip: {get_remote_ip()}")
     st.title("操作指南")  
     # html = "https://www.tensorflow.org/?hl=zh-cn"
     # st.components.v1.html(html, width=None, height=None, scrolling=False)

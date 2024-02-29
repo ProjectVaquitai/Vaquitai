@@ -17,7 +17,7 @@ import data_juicer.platform.src.pages.data_analysis
 # Read page configuration
 favicon = PIL.Image.open('./data_juicer/platform/src/assets/favicon.png')
 st.set_page_config(
-    page_title='MtBuller',
+    page_title='Vaquita',
     page_icon=favicon,
     layout='wide',
     initial_sidebar_state='auto'
@@ -54,7 +54,7 @@ def main():
 
     with st.sidebar:
         selected = option_menu(
-            "MtBuller",
+            "Vaquita",
             options=titles,
             icons=icons,
             menu_icon="box",
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     # Authentication
     name, authentication_status, username = authenticator.login(
         fields={
-            'Form name': 'Login-AI智能数据处理平台',
+            'Form name': 'Login-AI数据智能处理平台',
             'Username': 'Username',
             'Password': 'Password',
             'Login': 'Login'

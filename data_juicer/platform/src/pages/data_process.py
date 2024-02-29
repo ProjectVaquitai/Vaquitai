@@ -15,6 +15,7 @@ from loguru import logger
 from data_juicer.config import init_configs
 from data_juicer.core import Analyser, Executor
 from data_juicer.ops.base_op import OPERATORS
+from data_juicer.platform.src.utils.st_components import get_remote_ip
 
 
 @st.cache_data
@@ -236,6 +237,7 @@ class Visualize:
 
 
 def write():
+    logger.info(f"enter process page, user_name: {st.session_state['name']}, ip: {get_remote_ip()}")
     Visualize.visualize()
 
 

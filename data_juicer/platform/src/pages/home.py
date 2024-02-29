@@ -7,9 +7,12 @@
 
 import streamlit as st
 import data_juicer.platform.src.utils.st_components as st_components
+from data_juicer.platform.src.utils.st_components import get_remote_ip
+from loguru import logger
 
 def write():
     # st.title("Welcome to MtBuller!")
+    logger.info(f"enter home page, user_name: {st.session_state['name']}, ip: {get_remote_ip()}")
 
     # st.write(
     #     """        
@@ -23,8 +26,46 @@ def write():
 
     # Vaquita瓦奇塔能带来什么？
     st.title('Vaquita瓦奇塔能带来什么？')
-    st.markdown("[【Notion 链接】](https://celestialanthem.notion.site/Vaquita-4cd9a3240c724f9abde709a2358b15bf?pvs=4)")
+    # st.image('caeefa0c-7dcb-4b57-b6a6-ba7b4ed2aebb/Untitled.png?id=ff8d46ef-fca0-4b02-b90d-e1c44994ca55&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709294400000&signature=eNWDjXJqL3rVaLC1IeL2nvsx1dWyr1WzcVlsHwTihiU&downloadName=Untitled.png', width=400)
 
+    
+    st.markdown("[【Notion 链接】](https://celestialanthem.notion.site/Vaquita-4cd9a3240c724f9abde709a2358b15bf?pvs=4)")
+    st.markdown("""
+        
+        ### 简介
+        Vaquita瓦奇塔，开源的 AI 数据处理平台，帮助用户快速理解数据集，发现其中的异常或“坏蛋”，并以最高效的方式找到用户所需的数据
+    """)
+    # 使命和愿景
+    st.markdown("""
+        
+        ### 使命
+        让 AI 数据处理变得更简单、更智能
+        
+        ### 愿景
+        我们致力于解决 AI 数据处理中的挑战，让更多人能够轻松训练出更优秀的 AI 模型，从而释放 AI 的潜力，改变世界
+    """)
+
+    # 目标用户
+    st.subheader('目标用户')
+    st.write("包括但不限于数据科学家、数据分析师、数据工程师和 AI 工程师")
+
+    # 优势
+    st.subheader('优势')
+    st.write("""
+        1. **无需编程**：我们的平台提供直观易用的界面，无需编程知识即可进行数据处理和分析
+        2. **自动化数据分析**：借助我们的智能算法，用户可以自动分析大规模数据集，节省时间和精力
+        3. **交互式数据可视化**：我们提供丰富的可视化工具，帮助用户更直观地理解数据
+        4. **数据异常检测**：我们的平台能够快速识别数据中的异常或不一致性，帮助用户及时发现并解决问题
+    """)
+
+    # 发展规划
+    st.subheader('发展规划')
+    st.write("""
+        1. **功能拓展**：我们将持续增加新功能和支持更多数据类型，以满足不断变化的用户需求
+        2. **开发者生态**：我们鼓励开发者参与，支持他们开发自定义功能并共享给其他用户，构建一个互助共赢的生态系统
+        3. **智能化技术**：我们将不断优化算法和技术，实现更智能的数据输入和模块调度，提升用户体验
+        4. **自然语言交互**：我们计划引入自然语言处理技术，让用户可以通过自然语言与平台进行交互，实现更便捷的操作和查询
+    """)
     # 目录
     # st.markdown('''
     # - [揪出您数据集中的坏蛋](#揪出您数据集中的坏蛋)
@@ -52,49 +93,48 @@ def write():
 
     st.markdown('### 图像数据')
     st.markdown('#### 低信息')
-    st.image('https://file.notion.so/f/f/f5292c1b-d6eb-49ee-9a74-ad98cd50f569/d87f1ce3-4272-4ccc-8ac3-f33197b5477a/Untitled.png?id=31ebc759-ce49-4fbd-be85-3f1285ab4906&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709251200000&signature=5jj_HIBn0BMVHtDie24IqjO04xmj5jVxtjVY9XzaZsU&downloadName=Untitled.png', width=800)
+    st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/404.png', width=800)
 
     st.markdown('#### 低信息-模糊')
-    st.image('https://file.notion.so/f/f/f5292c1b-d6eb-49ee-9a74-ad98cd50f569/f61217db-3931-45a5-87bf-a9fae9b16a99/Untitled.png?id=550a3bfd-94c9-4538-a33c-024f302dfc56&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709222400000&signature=8eyMdlX6c1oaOtK0-KvkEMNFyVsNdx0h1aAEUkYEfiE&downloadName=Untitled.png', width=800)
+    st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/low_info.png', width=800)
 
     st.markdown('#### 重复')
-    st.image('https://file.notion.so/f/f/f5292c1b-d6eb-49ee-9a74-ad98cd50f569/2677086f-17c2-4589-910d-c0612d192adc/Untitled.png?id=9d42ef73-1ce5-4857-b635-77a7ce1bf4d6&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709222400000&signature=Pq8oKBQXbSXa7_jrQ2W1fZatJOs9kzmb3EdFG25C90U&downloadName=Untitled.png', width=800)
-
+    st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/duplicated.png', width=800)
     st.markdown('#### 特殊比例')
-    st.image('https://file.notion.so/f/f/f5292c1b-d6eb-49ee-9a74-ad98cd50f569/808601bb-302e-4ce5-98e7-13bd88773ea1/Untitled.png?id=156ab113-0578-4691-80da-1ca7c26b9144&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709222400000&signature=PQus7ISfzKbEKgUu0-ugatMl422HxxV0NacSQ8Wte4c&downloadName=Untitled.png', width=800)
+    st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/ratio.png', width=800)
 
     st.markdown('#### NSFW (NSFW 通常用来指代那些包含不适宜在工作场合或公共场合观看的内容，例如色情、暴力或其他可能引起不适的内容。)')
-    st.image('https://file.notion.so/f/f/f5292c1b-d6eb-49ee-9a74-ad98cd50f569/9cdbeb19-5c9e-4e20-b29c-879560f2031d/Untitled.png?id=c15e4c84-5dcb-464c-afa9-5ecbdd00d266&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709222400000&signature=-tdQeMkUG7LdQUmGCz3XDMqSmHr8gWfzDUH_scE5MXM&downloadName=Untitled.png', width=800)
+    st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/nsfw.png', width=800)
 
-    st.markdown('### 图文对儿数据')
+    st.markdown('### 图文对数据')
     st.markdown('#### 文本-图片不匹配')
     st.markdown('<p>文本：BDD-A Dataset | Papers With Code</p>', unsafe_allow_html=True)
-    st.image('https://file.notion.so/f/f/f5292c1b-d6eb-49ee-9a74-ad98cd50f569/e69a9fca-12cd-49a0-899e-536aa4a94829/Untitled.png?id=bdcb21cf-5eb1-4572-b91b-76ff1625effd&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709222400000&signature=Szd9Iz5BJTnFUD2aSwYqx6r4cjlIkTcat7nt5G00hMU&downloadName=Untitled.png', width=800)
+    st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/mismatch.png', width=800)
 
-    st.markdown('#### 文本照抄图像文字')
+    st.markdown('#### 文本未描述图片仅照抄文字')
     st.markdown('<p>文本：Flower Seekers by Blue Derby Foods Ride</p>', unsafe_allow_html=True)
-    st.image('https://file.notion.so/f/f/f5292c1b-d6eb-49ee-9a74-ad98cd50f569/0d7d98c7-04f2-444d-ab72-16a8ab4429d8/Untitled.png?id=a3b05258-7956-4b48-bb2a-8e7933ed3fbe&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709222400000&signature=TPq4GiknPzyPmyz5--DP3SXkzJerBn-CAKjfP_NBT1A&downloadName=Untitled.png', width=800)
+    st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/flower_seekers.png', width=800)
 
     ## 搜寻您想要的数据
     st.markdown('## 搜寻您想要的数据')
 
     st.markdown('### 文本检索')
-    st.image('https://file.notion.so/f/f/f5292c1b-d6eb-49ee-9a74-ad98cd50f569/3a366679-3810-43b6-afd8-77a8dd342311/Untitled.png?id=18855209-0ce7-4243-879b-e083a2eb78c3&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709272800000&signature=GOE9a_EPbAFgsn3bfcjq4CBQHE22SjlEAa5ER62xzpw&downloadName=Untitled.png', width=800)
+    st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/text_retrieval.png', width=800)
 
     st.markdown('### 图像检索')
-    st.image('https://file.notion.so/f/f/f5292c1b-d6eb-49ee-9a74-ad98cd50f569/76fedb68-dc68-46aa-bc80-29c1702d8c9f/Untitled.png?id=097dc595-ad73-4cc7-85a3-3847692c865e&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709272800000&signature=-1Zw6HagIWPw7IMHtPO7bQK0UcODna7IayZJ-DhnLFQ&downloadName=Untitled.png', width=800)
+    st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/image_retrieval.png', width=800)
 
     ## 了解您的数据集
     st.markdown('## 了解您的数据集')
 
     st.markdown('### 交互式数据分布')
-    st.image('https://file.notion.so/f/f/f5292c1b-d6eb-49ee-9a74-ad98cd50f569/903be8d5-c793-4742-a523-685f040bb276/Untitled.png?id=4d74845e-31e0-4b25-b520-b10d7ed313bf&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709272800000&signature=J4Fy52k_7DKPyk3pmBSFlWIEMcBZVj5TL3VG1oWAyC4&downloadName=Untitled.png', width=800)
+    st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/data_distribution.png', width=800)
 
     st.markdown('### 数据集对比')
-    st.image('https://file.notion.so/f/f/f5292c1b-d6eb-49ee-9a74-ad98cd50f569/2bafbcff-536f-4fdb-83cc-845953d3e4e8/Untitled.png?id=7040b0d7-4d56-4f40-bba0-b08109931dc2&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709272800000&signature=DimmVRB8HuP7M3xvId6Ne3ed4CYwrhpOjCsSfAAJgwQ&downloadName=Untitled.png', width=800)
+    st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/compare_datasets.png', width=800)
 
     st.markdown('### 关联性展示')
-    st.image('https://file.notion.so/f/f/f5292c1b-d6eb-49ee-9a74-ad98cd50f569/f8c2aaa8-3208-4bc8-9dbc-6993042245bc/Untitled.png?id=e2b53930-72f5-4a51-b9f4-d6cecf7e6d6f&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709272800000&signature=0NSotb0U9BfOJFitqXn_ja6diu_ZirRqI9rDcJMARRE&downloadName=Untitled.png', width=800)
+    st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/associations.png', width=800)
 
     st.markdown('### 桑基图')
-    st.image('https://file.notion.so/f/f/f5292c1b-d6eb-49ee-9a74-ad98cd50f569/f7f67615-6c64-45b9-a2a0-af30e813b47f/Untitled.png?id=ff95575f-ec90-4749-a90c-875e3e5ef08f&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709272800000&signature=5DwHi47VaWkjMZKMWKqKgNoTuJ7xaVAUtEQJlZxwam8&downloadName=Untitled.png', width=800)
+    st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/sankey.png', width=800)

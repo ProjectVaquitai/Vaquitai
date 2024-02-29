@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 import faiss
 import altair as alt
+from loguru import logger
 import plotly.graph_objects as go
 import torch.nn.functional as F
 import streamlit as st
@@ -24,6 +25,7 @@ from PIL import Image
 from data_juicer.format.load import load_formatter
 from data_juicer.utils.model_utils import get_model, prepare_model
 from data_juicer.utils.vis import plot_dup_images
+from data_juicer.platform.src.utils.st_components import get_remote_ip
 import random
 
 
@@ -115,7 +117,7 @@ def write():
                 ], default="data_show")
 
     try:
-        processed_dataset = load_dataset('/mnt/share_disk/LIV/data_centric/demo-bdd-anno.jsonl')  
+        processed_dataset = load_dataset('/root/dataset/bdd_anno.jsonl')  
         # processed_dataset = pd.DataFrame(processed_dataset)
     except:
         st.warning('请先执行数据处理流程 !')
@@ -139,6 +141,7 @@ def write():
         return None
 
     if chosen_id == 'data_show':
+        logger.info(f"enter data_show page, user_name: {st.session_state['name']}, ip: {get_remote_ip()}")
         html_code = """
             <style>
             .responsive-iframe-container {
@@ -163,6 +166,7 @@ def write():
         
 
     if chosen_id == 'data_cleaning':
+        logger.info(f"enter data_cleaning page, user_name: {st.session_state['name']}, ip: {get_remote_ip()}")
         t0 = time.time()
         dc_df = processed_dataset.remove_columns(["attributes", "labels"])
         category = st.selectbox("选择数据类型", list(data_source.keys()))
@@ -238,6 +242,7 @@ def write():
         # amount = st.slider("展示数量", min_value=1, max_value=10, value=3, step=1)
         amount = 3
         if category_issue:
+            logger.info(f"click clean_sample_show button, {category_issue}, user_name: {st.session_state['name']}, ip: {get_remote_ip()}")
             # selected_issues = dc_df[dc_df[issue_dict[category_issue]] == True]
             selected_issues = dc_df.filter(lambda example: example[issue_dict[category_issue]] == True)
             # selected_rows = selected_issues.sample(min(amount, len(selected_issues)))
@@ -270,6 +275,7 @@ def write():
                            file_name='discarded.jsonl')
 
     elif chosen_id == 'data_mining':
+        logger.info(f"enter data_mining page, user_name: {st.session_state['name']}, ip: {get_remote_ip()}")
         html_code = """
             <style>
             .responsive-iframe-container {
@@ -320,6 +326,7 @@ def write():
         #         st.image(image_path, caption='Retrieved Image', use_column_width=False)
 
     elif chosen_id == 'data_insights':
+        logger.info(f"enter data_insights page, user_name: {st.session_state['name']}, ip: {get_remote_ip()}")
         col1, col2, col3 = st.columns(3)
         compare_features = ['attributes.weather', 'attributes.scene', 'attributes.timeofday', \
                         'labels.car', 'labels.person', '__dj__is_image_duplicated_issue', \
@@ -348,6 +355,7 @@ def write():
 
        
         if analysis_button:
+            logger.info(f"click analysis button, {category_1}, {category_2}, user_name: {st.session_state['name']}, ip: {get_remote_ip()}")
             st.markdown('<iframe src="http://datacentric.club:3000/" width="1000" height="500"></iframe>', unsafe_allow_html=True)
             # st.markdown('<iframe src="http://datacentric.club:3000/" width="600" height="500"></iframe>', unsafe_allow_html=True)
             html_save_path = os.path.join('frontend', st.session_state['username'], \

@@ -10,7 +10,7 @@
         - [NSFW](#NSFW)
     - [图文对儿数据](#图文对儿数据)
         - [文本-图片不匹配](#文本-图片不匹配)
-        - [文本照抄图像文字](#文本照抄图像文字)
+        - [文本未描述图片仅照抄文字](#文本未描述图片仅照抄文字)
 - [搜寻您想要的数据](#搜寻您想要的数据)
     - [文本检索](#文本检索)
     - [图像检索](#图像检索)
@@ -42,7 +42,7 @@
 <p>文本：BDD-A Dataset | Papers With Code</p>
 <img src="https://file.notion.so/f/f/f5292c1b-d6eb-49ee-9a74-ad98cd50f569/e69a9fca-12cd-49a0-899e-536aa4a94829/Untitled.png?id=bdcb21cf-5eb1-4572-b91b-76ff1625effd&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709222400000&signature=Szd9Iz5BJTnFUD2aSwYqx6r4cjlIkTcat7nt5G00hMU&downloadName=Untitled.png" alt="图片描述" width="800" height="auto"/> 
 
-#### 文本照抄图像文字
+#### 文本未描述图片仅照抄文字
 <p>文本：Flower Seekers by Blue Derby Foods Ride</p>
 <img src="https://file.notion.so/f/f/f5292c1b-d6eb-49ee-9a74-ad98cd50f569/0d7d98c7-04f2-444d-ab72-16a8ab4429d8/Untitled.png?id=a3b05258-7956-4b48-bb2a-8e7933ed3fbe&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709222400000&signature=TPq4GiknPzyPmyz5--DP3SXkzJerBn-CAKjfP_NBT1A&downloadName=Untitled.png" alt="图片描述" width="800" height="auto"/> 
 
