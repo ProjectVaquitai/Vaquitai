@@ -15,8 +15,8 @@ keep_hashes_in_res_ds: False
 # a list of several process operators with their arguments
 process:
   - image_validation_filter:
-  - image_blurriness_filter:
-  - image_brightness_filter:
+  # - image_blurriness_filter:
+  # - image_brightness_filter:
   - image_deduplicator:
   - cleanvision_mycleanlab:
   - image_feature_extract_generator:

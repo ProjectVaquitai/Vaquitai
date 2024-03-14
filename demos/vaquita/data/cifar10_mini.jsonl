@@ -98,4 +98,5 @@
 {"image": "./demos/vaquita/data//cifar10_cl/station_wagon_s_001387-1.png", "annotations": ["automobile"]}
 {"image": "./demos/vaquita/data//cifar10_cl/station_wagon_s_002712.png", "annotations": ["automobile"]}
 {"image": "./demos/vaquita/data//cifar10_cl/odocoileus_hemionus_s_000221.png", "annotations": ["deer"]}
-{"image": "./demos/vaquita/data//cifar10_cl/convertible_s_001715.png", "annotations": ["automobile"]}
+{"image": "./demos/vaquita/data//cifar10_cl/wrecker_s_002395.png", "annotations": ["wrecker"]}
+{"image": "./demos/vaquita/data//cifar10_cl/wrecker_s_002410.png", "annotations": ["wrecker"]}
