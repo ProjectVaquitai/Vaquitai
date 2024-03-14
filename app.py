@@ -17,7 +17,7 @@ import data_juicer.platform.src.pages.data_analysis
 # Read page configuration
 favicon = PIL.Image.open('./data_juicer/platform/src/assets/favicon.png')
 st.set_page_config(
-    page_title='Vaquita',
+    page_title='Vaquitai',
     page_icon=favicon,
     layout='wide',
     initial_sidebar_state='auto'
@@ -40,9 +40,9 @@ def main():
     # Define application list
     apps = [
         {"func": data_juicer.platform.src.pages.home, "title": "首页", "icon": "house"},
-        {"func": data_juicer.platform.src.pages.data_process, "title": "数据处理", "icon": "caret-right-square"}, 
-        {"func": data_juicer.platform.src.pages.data_analysis, "title": "数据结果分析", "icon": "bar-chart-line"},  
-        {"func": data_juicer.platform.src.pages.doc, "title": "文档", "icon": "book"}
+        {"func": data_juicer.platform.src.pages.doc, "title": "文档", "icon": "book"},
+        {"func": data_juicer.platform.src.pages.data_process, "title": "运行", "icon": "caret-right-square"}, 
+        {"func": data_juicer.platform.src.pages.data_analysis, "title": "结果", "icon": "bar-chart-line"}
     ]
     
 
@@ -55,7 +55,7 @@ def main():
 
     with st.sidebar:
         selected = option_menu(
-            "Vaquita",
+            "Vaquitai",
             options=titles,
             icons=icons,
             menu_icon="box",
@@ -71,13 +71,12 @@ def main():
         st.image("https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/qrcode.jpg")
         st.info(
         """
-        This web [app](http://datacentric.club/) is maintained by [Vaquita](https://github.com/ProjectVaquita). You can follow us on community:
-            [GitHub](https://github.com/cyclopes2022),
+        This web [app](http://datacentric.club/) is maintained by [vaquitai](https://github.com/ProjectVaquitai). You can follow us on community:
+            [GitHub](https://github.com/ProjectVaquitai/Vaquitai),
             [小红书](https://www.xiaohongshu.com/user/profile/5cb921b0000000001102f005?xhsshare=CopyLink&appuid=63516e68000000001901e7dc&apptime=1709825164),
             [公众号](https://mp.weixin.qq.com/s/8ZQnHgp07rvTGEluoKp-rw),
             [知乎](https:///www.zhihu.com/people/VaquitaAI),
         
-        Source code: Coming soon
         """
         )
         st.write(f'Welcome *{st.session_state["name"]}*')

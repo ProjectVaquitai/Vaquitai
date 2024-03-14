@@ -54,8 +54,9 @@ def plot_dup_images(
         ax.set_title(image_list[i].split("/")[-1], fontsize=6)
         ax.axis('off')
     gs.tight_layout(fig)
-    
-    return plt.gcf()
+    res = plt.gcf()
+    plt.close()
+    return res
 
     if outfile:
         plt.savefig(outfile, dpi=300)

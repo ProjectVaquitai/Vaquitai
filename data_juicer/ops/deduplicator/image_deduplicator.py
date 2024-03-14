@@ -135,8 +135,8 @@ class ImageDeduplicator(Deduplicator):
             if hash in hashes:
                 sample[CleaningKeys.image_duplicated] = True
                 sample[CleaningKeys.image_duplicated_pairs] = dup_pairs.get(hash)
-                if sample[CleaningKeys.image_duplicated_pairs]:
-                    sample[CleaningKeys.image_duplicated_pairs].remove(sample[self.image_key])
+                # if sample[CleaningKeys.image_duplicated_pairs]:
+                #     sample[CleaningKeys.image_duplicated_pairs].remove(sample[self.image_key])
                 return sample
             else:
                 hashes.add(hash)

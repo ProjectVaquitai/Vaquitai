@@ -184,13 +184,12 @@ class Visualize:
 
             col1, col2 = st.columns(2)
             with col1:
-                example_cfg_f = './configs/demo/vaquita.yaml'
+                example_cfg_f = './configs/demo/vaquitai.yaml'
                 example_cfg_f = os.path.abspath(example_cfg_f)
 
                 st.text_area(label='方式一：配置文件路径',
                              key='input_cfg_cmd',
                              value=f'--config {example_cfg_f}')
-
 
             with col2:
                 st.file_uploader(label='方式二：上传配置文件',
@@ -206,8 +205,7 @@ class Visualize:
             else:
                 text1 = st.session_state.get('cfg_text1', '')
                 text2 = st.session_state.get('cfg_text2', '')
-            
-            st.text_area(label='配置文件解析结果', value=text2)
+            st.text_area(label='配置文件解析结果', value=text2, height=400)
 
 
     @staticmethod

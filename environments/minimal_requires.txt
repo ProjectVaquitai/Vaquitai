@@ -16,12 +16,15 @@ lz4
 pdfplumber
 plotly
 python-docx
-streamlit
 spacy==3.5.0
 multiprocess==0.70.12
 dill==0.3.4
 opencv-python
 umap-learn
-streamlit_option_menu
 sweetviz
 faiss_cpu
+streamlit==1.30.0
+streamlit_option_menu==0.3.6
+streamlit_authenticator==0.3.1
+extra-streamlit-components==0.1.60
+streamlit-pandas-profiling==0.1.3

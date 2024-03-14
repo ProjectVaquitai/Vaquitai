@@ -117,14 +117,15 @@ def write():
                 ], default="data_show")
 
     try:
-        processed_dataset = load_dataset('./outputs/demo-gn/demo-processed.jsonl')  
+        processed_dataset = load_dataset('./outputs/demo-vaquitai/demo-processed.jsonl')  
         # processed_dataset = pd.DataFrame(processed_dataset)
     except:
         st.warning('请先执行数据处理流程 !')
         st.stop()
 
     # TODO: Automatically find data source
-    data_source = {'BDD100K-train': 'train', 'BDD100K-val': 'val', 'BDD100K-test': 'test'}
+    # data_source = {'BDD100K-train': 'train', 'BDD100K-val': 'val', 'BDD100K-test': 'test'}
+    data_source = {'train': 'train'}
     issue_dict = {'重复': '__dj__is_image_duplicated_issue',
                 '低信息': '__dj__is_low_information_issue',                 
                 '特殊大小': '__dj__is_odd_size_issue', 
@@ -282,8 +283,8 @@ def write():
             retrieval_image_list = [processed_dataset['image'][i] for i in I[0]]
             # display_image_grid(retrieval_image_list, 5, 300)
             # Display the retrieved images using st.image
-            for image_path in retrieval_image_list:
-                st.image(image_path, caption=image_path, use_column_width=False)
+            for idx, image_path in enumerate(retrieval_image_list):
+                st.image(image_path, caption='Path: ' + image_path + '  ,Distance: ' + str(D[0][idx]), use_column_width=False)
 
     elif chosen_id == 'data_insights':
         logger.info(f"enter data_insights page, user_name: {st.session_state['name']}, ip: {get_remote_ip()}")
