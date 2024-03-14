@@ -26,7 +26,7 @@ def write():
 
     # Vaquita瓦奇塔能带来什么？
     st.title('Vaquita瓦奇塔能带来什么？')
-    # st.image('caeefa0c-7dcb-4b57-b6a6-ba7b4ed2aebb/Untitled.png?id=ff8d46ef-fca0-4b02-b90d-e1c44994ca55&table=block&spaceId=f5292c1b-d6eb-49ee-9a74-ad98cd50f569&expirationTimestamp=1709294400000&signature=eNWDjXJqL3rVaLC1IeL2nvsx1dWyr1WzcVlsHwTihiU&downloadName=Untitled.png', width=400)
+    # st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/intro.jpg', width=400)
 
     
     st.markdown("[【Notion 链接】](https://celestialanthem.notion.site/Vaquita-4cd9a3240c724f9abde709a2358b15bf?pvs=4)")
@@ -35,6 +35,9 @@ def write():
         ### 简介
         Vaquita瓦奇塔，开源的 AI 数据处理平台，帮助用户快速理解数据集，发现其中的异常或“坏蛋”，并以最高效的方式找到用户所需的数据
     """)
+    st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/intro.jpg', width=400)
+    # st.write("Vaquita的具体功能如下：")
+    # st.image('https://datacentric-1316957999.cos.ap-beijing.myqcloud.com/data-centric/app_image/home/detail.jpg', width=1200)
     # 使命和愿景
     st.markdown("""
         

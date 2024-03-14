@@ -117,7 +117,7 @@ def write():
                 ], default="data_show")
 
     try:
-        processed_dataset = load_dataset('/root/dataset/bdd_anno.jsonl')  
+        processed_dataset = load_dataset('./outputs/demo-gn/demo-processed.jsonl')  
         # processed_dataset = pd.DataFrame(processed_dataset)
     except:
         st.warning('请先执行数据处理流程 !')
@@ -142,35 +142,17 @@ def write():
 
     if chosen_id == 'data_show':
         logger.info(f"enter data_show page, user_name: {st.session_state['name']}, ip: {get_remote_ip()}")
-        html_code = """
-            <style>
-            .responsive-iframe-container {
-                position: relative;
-                overflow: hidden;
-                padding-top: 56.25%; /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
-            }
-            .responsive-iframe-container iframe {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-            }
-            </style>
-            <div class="responsive-iframe-container">
-            <iframe src="http://datacentric.club:8050/" allowfullscreen></iframe>
-            </div>
-            """
-        # st.markdown("<h1 style='text-align: center; font-size:25px; color: black;'>以文搜图", unsafe_allow_html=True)
-        st.markdown(html_code, unsafe_allow_html=True)
+        df = processed_dataset.flatten().to_pandas()
+        st.dataframe(df)
         
 
     if chosen_id == 'data_cleaning':
         logger.info(f"enter data_cleaning page, user_name: {st.session_state['name']}, ip: {get_remote_ip()}")
         t0 = time.time()
-        dc_df = processed_dataset.remove_columns(["attributes", "labels"])
-        category = st.selectbox("选择数据类型", list(data_source.keys()))
-        dc_df = dc_df.filter(lambda example: example['data_source'] == data_source[category])
+        # dc_df = processed_dataset.remove_columns(["attributes", "labels"])
+        dc_df = processed_dataset
+        # category = st.selectbox("选择数据类型", list(data_source.keys()))
+        # dc_df = dc_df.filter(lambda example: example['data_source'] == data_source[category])
         filter_nums = {}
         # iterate over the dataset to count the number of samples that are discarded
         all_conds = np.ones(len(dc_df['image']), dtype=bool)
@@ -276,77 +258,51 @@ def write():
 
     elif chosen_id == 'data_mining':
         logger.info(f"enter data_mining page, user_name: {st.session_state['name']}, ip: {get_remote_ip()}")
-        html_code = """
-            <style>
-            .responsive-iframe-container {
-                position: relative;
-                overflow: hidden;
-                padding-top: 56.25%; /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
-            }
-            .responsive-iframe-container iframe {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-            }
-            </style>
-            <div class="responsive-iframe-container">
-            <iframe src="http://datacentric.club:8501/" allowfullscreen></iframe>
-            </div>
-            """
-        # st.markdown("<h1 style='text-align: center; font-size:25px; color: black;'>以文搜图", unsafe_allow_html=True)
-        # st.markdown(html_code, unsafe_allow_html=True)
-        st.markdown('<iframe src="http://datacentric.club:8501/" width="1000" height="500"></iframe>', unsafe_allow_html=True)
 
-        # st.markdown('<iframe src="http://0.0.0.0:8501" width="1000" height="600"></iframe>', unsafe_allow_html=True)
-        # if '__dj__image_embedding_2d' not in processed_dataset.features:
-        #     st.warning('请先执行数据处理流程(加入特征提取的算子) !')
-        #     st.stop()
+        if '__dj__image_embedding_2d' not in processed_dataset.features:
+            st.warning('请先执行数据处理流程(加入特征提取的算子) !')
+            st.stop()
 
-        # faiss_index = create_faiss_index(processed_dataset['__dj__image_embedding'])
-        # model, processor = load_model()
+        faiss_index = create_faiss_index(processed_dataset['__dj__image_embedding'])
+        model, processor = load_model()
 
-        # # 用户输入文本框
-        # input_text = st.text_input("", 'a picture of horse')
+        # 用户输入文本框
+        input_text = st.text_input("", 'a picture of horse')
 
-        # # 搜索按钮
-        # search_button = st.button("搜索", type="primary", use_container_width=True)
+        # 搜索按钮
+        search_button = st.button("搜索", type="primary", use_container_width=True)
 
-        # if search_button:
-        #     inputs = processor(text=input_text, return_tensors="pt")
-        #     text_output = model.text_encoder(inputs.input_ids, attention_mask=inputs.attention_mask, return_dict=True) 
-        #     text_feature = F.normalize(model.text_proj(text_output.last_hidden_state[:, 0, :]), dim=-1).detach().cpu().numpy() 
+        if search_button:
+            inputs = processor(text=input_text, return_tensors="pt")
+            text_output = model.text_encoder(inputs.input_ids, attention_mask=inputs.attention_mask, return_dict=True) 
+            text_feature = F.normalize(model.text_proj(text_output.last_hidden_state[:, 0, :]), dim=-1).detach().cpu().numpy() 
 
-        #     D, I = faiss_index.search(text_feature.astype('float32'), 10)
-        #     retrieval_image_list = [processed_dataset['image'][i] for i in I[0]]
-        #     display_image_grid(retrieval_image_list, 5, 300)
-        #     # Display the retrieved images using st.image
-        #     for image_path in retrieval_image_list:
-        #         st.image(image_path, caption='Retrieved Image', use_column_width=False)
+            D, I = faiss_index.search(text_feature.astype('float32'), 10)
+            retrieval_image_list = [processed_dataset['image'][i] for i in I[0]]
+            # display_image_grid(retrieval_image_list, 5, 300)
+            # Display the retrieved images using st.image
+            for image_path in retrieval_image_list:
+                st.image(image_path, caption=image_path, use_column_width=False)
 
     elif chosen_id == 'data_insights':
         logger.info(f"enter data_insights page, user_name: {st.session_state['name']}, ip: {get_remote_ip()}")
         col1, col2, col3 = st.columns(3)
-        compare_features = ['attributes.weather', 'attributes.scene', 'attributes.timeofday', \
-                        'labels.car', 'labels.person', '__dj__is_image_duplicated_issue', \
-                        '__dj__is_odd_size_issue', '__dj__is_odd_aspect_ratio_issue',\
-                        '__dj__is_low_information_issue', '__dj__is_light_issue',\
-                        '__dj__is_grayscale_issue', '__dj__is_dark_issue', '__dj__is_blurry_issue']
+        compare_features = list(processed_dataset.features)
 
         with col1:
             category_1 = st.selectbox('选择数据集1', list(data_source.keys()))
 
         with col2:
-            category_2 = st.selectbox('选择数据集2', ['None'] + list(data_source.keys()))
+            category_2 = st.selectbox('选择数据集2', ['None'])
 
         with col3:
             st.write(' ')
             analysis_button = st.button("开始分析数据", type="primary", use_container_width=False)
 
-        # df1 = processed_dataset.to_pandas()[compare_features]
-        dc_df = processed_dataset.filter(lambda example: example['data_source'] == data_source[category_1])
-        df1 = dc_df.flatten().to_pandas()[compare_features]
+        # dc_df = processed_dataset.filter(lambda example: example['data_source'] == data_source[category_1])
+        df1 = processed_dataset.flatten().to_pandas()[compare_features]
+        array_columns = df1.select_dtypes(include=[np.ndarray]).columns
+        df1 = df1.drop(columns=array_columns)
 
         if category_2 != 'None':
             # df2 = processed_dataset.to_pandas()[compare_features]
@@ -356,8 +312,14 @@ def write():
        
         if analysis_button:
             logger.info(f"click analysis button, {category_1}, {category_2}, user_name: {st.session_state['name']}, ip: {get_remote_ip()}")
-            st.markdown('<iframe src="http://datacentric.club:3000/" width="1000" height="500"></iframe>', unsafe_allow_html=True)
             # st.markdown('<iframe src="http://datacentric.club:3000/" width="600" height="500"></iframe>', unsafe_allow_html=True)
+            if '__dj__image_embedding_2d'  in processed_dataset.features:
+                st.markdown("<h1 style='text-align: center; font-size:25px; color: black;'>数据分布可视化", unsafe_allow_html=True)
+                plot = plot_image_clusters(processed_dataset)
+                st.altair_chart(plot)
+            else:
+                st.warning('请先执行数据处理流程(加入特征提取的算子) !')
+
             html_save_path = os.path.join('frontend', st.session_state['username'], \
                                           category_1 + '_vs_' + category_2 + '_EDA.html')
             shutil.os.makedirs(Path(html_save_path).parent, exist_ok=True)
@@ -370,12 +332,3 @@ def write():
                             report = sv.compare(df1, df2)
                     report.show_html(filepath=html_save_path, open_browser=False, layout='vertical', scale=1.0)
                 components.html(open(html_save_path).read(), width=1100, height=1200, scrolling=True)
-        
-
-        # st.markdown("<h1 style='text-align: center; font-size:25px; color: black;'>以文搜图", unsafe_allow_html=True)
-        # if '__dj__image_embedding_2d' not in processed_dataset.features:
-        #     st.warning('请先执行数据处理流程(加入特征提取的算子) !')
-        #     st.stop()
-        # st.markdown("<h1 style='text-align: center; font-size:25px; color: black;'>数据分布可视化", unsafe_allow_html=True)
-        # plot = plot_image_clusters(processed_dataset)
-        # st.altair_chart(plot)
