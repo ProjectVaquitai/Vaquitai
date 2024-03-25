@@ -209,8 +209,10 @@ def write():
         
         cat_issue_dict = {}
         for key, value in issue_dict.items():
-            if filter_nums[value] > 0:
-                cat_issue_dict[key] = value
+            res_tmp = filter_nums.get(value, None)
+            if res_tmp:
+                if res_tmp > 0:
+                    cat_issue_dict[key] = value
         
         images_per_col = 3
         st.text("")
