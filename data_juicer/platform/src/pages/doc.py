@@ -14,7 +14,7 @@ def write():
     # html = "https://www.tensorflow.org/?hl=zh-cn"
     # st.components.v1.html(html, width=None, height=None, scrolling=False)
     # Read the contents of the Markdown file
-    with open('./README.MD', 'r') as file:
+    with open('./README.md', 'r') as file:
         markdown_text = file.read()
 
     # Display the Markdown content in the Streamlit app
