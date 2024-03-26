@@ -18,7 +18,8 @@ __pycache__
 demos/data_image
 demos/data_gn*
 demos/data_bdd
-demos/data_znr
+demos/data_zn
+demos/znr
 .vscode
 nohup.out
 frontend/

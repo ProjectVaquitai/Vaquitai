@@ -10,6 +10,7 @@ from PIL import Image
 def plot_dup_images(
     orig: str,
     image_list: List,
+    dup_amount: int,
     scores: bool = False,
     outfile: str = None,
 ) -> None:
@@ -33,7 +34,8 @@ def plot_dup_images(
         gs[0, 1:3]
     )  # Always plot the original image in the middle of top row
     ax.imshow(Image.open(orig))
-    ax.set_title('Duplicated Found: %d, %s' % (len(image_list), orig.split("/")[-1]))
+    ax.set_title('Duplicated: %d' % (dup_amount), color='red', ha='center')
+    # ax.text(1.0, 1.0, orig.split("/")[-1])
     ax.axis('off')
 
     for i in range(0, n_ims):

@@ -245,8 +245,9 @@ def write():
                 dup_images = selected_rows['__dj__duplicated_pairs']
                 for i in range(0, len(ori_images), images_per_col):
                     cols = st.columns(images_per_col)
-                    for col, ori_img, dup_imgs in zip(cols, ori_images[i:i+images_per_col], dup_images[i:i+images_per_col]):
-                        display_image = plot_dup_images(ori_img, dup_imgs)
+                    for col, ori_img, dup_imgs_all in zip(cols, ori_images[i:i+images_per_col], dup_images[i:i+images_per_col]):
+                        dup_imgs = random.sample(dup_imgs_all, min(len(dup_imgs_all), 12))
+                        display_image = plot_dup_images(ori_img, dup_imgs, len(dup_imgs_all))
                         col.pyplot(display_image)              
         
         print(all_conds)
