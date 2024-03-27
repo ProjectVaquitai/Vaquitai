@@ -66,7 +66,7 @@ class ImageDeduplicator(Deduplicator):
                 image_array=np.array(images[key]))
         return sample
 
-    def process(self, dataset, show_num=0):
+    def process(self, dataset, show_num=10):
         """
         For doc-level, dataset --> dataset.
 
@@ -97,10 +97,14 @@ class ImageDeduplicator(Deduplicator):
             hash = sample[HashKeys.imagehash]
             if not hash:
                 return True
-            if show_num > 0 and hash in dup_hashes \
-                    and len(dup_pairs[hash]) < 2:
+            # if show_num > 0 and hash in dup_hashes \
+                    # and len(dup_pairs[hash]) < 2:
+            if show_num > 0 and hash in dup_hashes:
+                print(len(dup_pairs[hash]))
+                
                 # tracer is open and not enough duplicate sample pairs
                 dup_pairs[hash].append(sample)
+                print(dup_pairs[hash])
             if hash in hashes:
                 return False
             else:
@@ -109,7 +113,6 @@ class ImageDeduplicator(Deduplicator):
 
         hashes = set()
         dup_pairs = {hash_v: [] for hash_v in dup_hashes} if dup_hashes else {}
-        print(dup_pairs)
         dataset = dataset.filter(
             _filter_dup_helper,
             fn_kwargs=dict(hashes=hashes),

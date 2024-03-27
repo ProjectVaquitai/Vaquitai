@@ -208,3 +208,60 @@ class Selector(OP):
         :return: selected dataset.
         """
         raise NotImplementedError
+
+class Mycleanlab(OP):
+
+    def __init__(self, *args, **kwargs):
+        """
+        Base class that conducts selection in dataset-level.
+
+        :param text_key: the key name of field that stores sample texts
+            to be processed
+        :param image_key: the key name of field that stores sample image list
+            to be processed
+        :param audio_key: the key name of field that stores sample audio list
+            to be processed
+        :param video_key: the key name of field that stores sample video list
+            to be processed
+        """
+        super(Mycleanlab, self).__init__(*args, **kwargs)
+
+    def process(self, dataset):
+        """
+        Dataset --> dataset.
+
+        :param dataset: input dataset
+        :return: selected dataset.
+        """
+        raise NotImplementedError
+
+class Generator(OP):
+
+    def __init__(self, *args, **kwargs):
+        """
+        Base class that conducts selection in dataset-level.
+
+        :param text_key: the key name of field that stores sample texts
+            to be processed
+        :param image_key: the key name of field that stores sample image list
+            to be processed
+        :param audio_key: the key name of field that stores sample audio list
+            to be processed
+        :param video_key: the key name of field that stores sample video list
+            to be processed
+        """
+        super(Generator, self).__init__(*args, **kwargs)
+
+        from data_juicer.core.data import wrap_func_with_nested_access
+        self.process = wrap_func_with_nested_access(self.process)
+
+    
+    def process(self, dataset):
+        """
+        Dataset --> dataset.
+
+        :param dataset: input dataset
+        :return: dataset with generated contents.
+        """
+        raise NotImplementedError
+    
