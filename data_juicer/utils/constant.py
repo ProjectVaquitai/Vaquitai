@@ -15,6 +15,13 @@ class Fields(object):
     context = DEFAULT_PREFIX + 'context__'
     suffix = DEFAULT_PREFIX + 'suffix__'
 
+    # video_frame_tags
+    video_frame_tags = DEFAULT_PREFIX + 'video_frame_tags__'
+    video_audio_tags = DEFAULT_PREFIX + 'video_audio_tags__'
+
+    # the name of diretory to store the produced multimodal data
+    multimodal_data_output_dir = DEFAULT_PREFIX + 'produced_data__'
+
 
 class StatsKeysMeta(type):
     """
@@ -129,6 +136,35 @@ class StatsKeysConstant(object):
     # multimodal
     image_text_similarity = 'image_text_similarity'
     image_text_matching_score = 'image_text_matching_score'
+    image_aesthetics_scores = 'image_aesthetics_scores'
+    image_nsfw_score = 'image_nsfw_score'
+    image_watermark_prob = 'image_watermark_prob'
+
+    # audios
+    audio_duration = 'audio_duration'
+    audio_nmf_snr = 'audio_nmf_snr'
+    audio_sizes = 'audio_sizes'
+
+    # videos
+    video_duration = 'video_duration'
+    video_aspect_ratios = 'video_aspect_ratios'
+    video_width = 'video_width'
+    video_height = 'video_height'
+    video_ocr_area_ratio = 'video_ocr_area_ratio'
+    video_aesthetic_score = 'video_aesthetic_score'
+    video_frames_aesthetics_score = 'video_frames_aesthetics_score'
+    video_motion_score = 'video_motion_score'
+    video_nsfw_score = 'video_nsfw_score'
+    video_watermark_prob = 'video_watermark_prob'
+
+    # multimodal
+    # image-text
+    image_text_similarity = 'image_text_similarity'
+    image_text_matching_score = 'image_text_matching_score'
+    phrase_grounding_recall = 'phrase_grounding_recall'
+
+    # video-text
+    video_frames_text_matching_score = 'video_frames_text_matching_score'
 
 
 class StatsKeys(object, metaclass=StatsKeysMeta):
@@ -143,6 +179,11 @@ class HashKeys(object):
     # image
     imagehash = DEFAULT_PREFIX + 'imagehash'
     
+    # video
+    videohash = DEFAULT_PREFIX + 'videohash'
+
+    # duplicate flag
+    is_duplicate = DEFAULT_PREFIX + 'is_duplicate'
     
 class CleaningKeys(object):
     # image
@@ -158,14 +199,17 @@ class CleaningKeys(object):
     validation_3d_annotation = DEFAULT_PREFIX + 'is_validation_3d_annotation_issue'
     validation_general_file = DEFAULT_PREFIX + "is_validation_general_file_issue"
     
+    
 class EmbKeys(object):
     image_embedding = DEFAULT_PREFIX + 'image_embedding'
     text_embedding = DEFAULT_PREFIX + 'text_embedding'
     image_embedding_2d = DEFAULT_PREFIX + 'image_embedding_2d'
     text_embedding_2d = DEFAULT_PREFIX + 'text_embedding_2d'
 
+
 class GenKeys(object):
     image_caption = DEFAULT_PREFIX + 'image_caption'
+
 
 class InterVars(object):
     # text
@@ -174,4 +218,10 @@ class InterVars(object):
     refined_words = DEFAULT_PREFIX + 'refined_words'
 
     # image
-    loaded_images = DEFAULT_PREFIX + 'loaded_images'
+    loaded_images = DEFAULT_PREFIX + 'loaded_images'  # Image
+
+    # audios
+    loaded_audios = DEFAULT_PREFIX + 'loaded_audios'  # (data, sampling_rate)
+
+    # videos
+    loaded_videos = DEFAULT_PREFIX + 'loaded_videos'  # InputContainer from av

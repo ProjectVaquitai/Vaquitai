@@ -5,7 +5,7 @@ import numpy as np
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, HashKeys, CleaningKeys
-from data_juicer.utils.mm_utils import load_image
+from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
 from ..base_op import OPERATORS, Deduplicator
 from ..op_fusion import LOADED_IMAGES
@@ -56,35 +56,9 @@ class ImageDeduplicator(Deduplicator):
             return sample
 
         # load images
-        loaded_image_key = sample[self.image_key]
-        images = {}
-        
-        if context and loaded_image_key in sample[Fields.context]:
-            # load from context
-            images[loaded_image_key] = sample[
-                Fields.context][loaded_image_key]
-        else:
-            if loaded_image_key not in images:
-                # avoid load the same images
-                image = load_image(loaded_image_key)
-                images[loaded_image_key] = image
-                if context:
-                    # store the image data into context
-                    sample[Fields.context][loaded_image_key] = image
-        
-        # for loaded_image_key in loaded_image_keys:
-        #     if context and loaded_image_key in sample[Fields.context]:
-        #         # load from context
-        #         images[loaded_image_key] = sample[
-        #             Fields.context][loaded_image_key]
-        #     else:
-        #         if loaded_image_key not in images:
-        #             # avoid load the same images
-        #             image = load_image(loaded_image_key)
-        #             images[loaded_image_key] = image
-        #             if context:
-        #                 # store the image data into context
-        #                 sample[Fields.context][loaded_image_key] = image
+        loaded_image_keys = sample[self.image_key]
+        sample, images = load_data_with_context(sample, context,
+                                                loaded_image_keys, load_image)
 
         # compute hash
         for key in images:
@@ -106,71 +80,38 @@ class ImageDeduplicator(Deduplicator):
             return dataset, {}
 
         dup_hashes = None
-        # if show_num > 0:
-        # sample duplicate pairs
-        hash2ids: Dict[int, Set[int]] = defaultdict(set)
-        for sid, hash_val in enumerate(dataset[HashKeys.imagehash]):
-            if hash_val:
-                hash2ids[hash_val].add(sid)
-        dup_samples = sorted(list(hash2ids.items()),
-                                key=lambda x: len(x[1]),
-                                reverse=True)
-        dup_hashes = set([
-            item[0] for item in dup_samples if len(item[1]) > 1
-        ])
-        
-        def _map_dup_helper(sample, hashes, dup_pairs):
-            ##### exact match #####
+        if show_num > 0:
+            # sample duplicate pairs
+            hash2ids: Dict[int, Set[int]] = defaultdict(set)
+            for sid, hash_val in enumerate(dataset[HashKeys.imagehash]):
+                if hash_val:
+                    hash2ids[hash_val].add(sid)
+            dup_samples = sorted(list(hash2ids.items()),
+                                 key=lambda x: len(x[1]),
+                                 reverse=True)
+            dup_hashes = set([
+                item[0] for item in dup_samples if len(item[1]) > 1
+            ][:show_num])
+
+        def _filter_dup_helper(sample, hashes):
             hash = sample[HashKeys.imagehash]
             if not hash:
-                # sample[CleaningKeys.image_duplicated_pairs] = []
-                sample[CleaningKeys.image_duplicated_pairs] = dup_pairs.get(hash)
-                return sample
-            # if show_num > 0 and hash in dup_hashes \
-            #         and len(dup_pairs[hash]) < 2:
-            if hash in dup_hashes:
+                return True
+            if show_num > 0 and hash in dup_hashes \
+                    and len(dup_pairs[hash]) < 2:
                 # tracer is open and not enough duplicate sample pairs
-                
-                dup_pairs[hash].append(sample[self.image_key])
+                dup_pairs[hash].append(sample)
             if hash in hashes:
-                sample[CleaningKeys.image_duplicated] = True
-                sample[CleaningKeys.image_duplicated_pairs] = dup_pairs.get(hash)
-                # if sample[CleaningKeys.image_duplicated_pairs]:
-                #     sample[CleaningKeys.image_duplicated_pairs].remove(sample[self.image_key])
-                return sample
+                return False
             else:
                 hashes.add(hash)
-                sample[CleaningKeys.image_duplicated] = False
-                sample[CleaningKeys.image_duplicated_pairs] = dup_pairs.get(hash)
-                if sample[CleaningKeys.image_duplicated_pairs]:
-                    sample[CleaningKeys.image_duplicated_pairs].remove(sample[self.image_key])
-                # sample[CleaningKeys.image_duplicated_pairs] = []
-                return sample
-
-        # def _filter_dup_helper(sample, hashes):
-        #     hash = sample[HashKeys.imagehash]
-        #     if not hash:
-        #         return True
-        #     if show_num > 0 and hash in dup_hashes \
-        #             and len(dup_pairs[hash]) < 2:
-        #         # tracer is open and not enough duplicate sample pairs
-        #         dup_pairs[hash].append(sample)
-        #     if hash in hashes:
-        #         return False
-        #     else:
-        #         hashes.add(hash)
-        #         return True
+                return True
 
         hashes = set()
         dup_pairs = {hash_v: [] for hash_v in dup_hashes} if dup_hashes else {}
-        # print(dup_pairs)
-        # dataset = dataset.filter(
-        #     _filter_dup_helper,
-        #     fn_kwargs=dict(hashes=hashes),
-        #     load_from_cache_file=False if show_num > 0 else True)  # num_proc=1
-        
-        dataset = dataset.map(
-            _map_dup_helper,
-            fn_kwargs=dict(hashes=hashes, dup_pairs=dup_pairs),
+        print(dup_pairs)
+        dataset = dataset.filter(
+            _filter_dup_helper,
+            fn_kwargs=dict(hashes=hashes),
             load_from_cache_file=False if show_num > 0 else True)  # num_proc=1
         return dataset, dup_pairs

@@ -32,7 +32,7 @@ def strip(document, strip_characters):
     emojis).
 
     :param document: document to be processed
-    :param strip_characters: characters uesd for stripping document
+    :param strip_characters: characters used for stripping document
     :return: stripped document
     """
     if not document:
@@ -76,7 +76,7 @@ def split_on_newline_tab_whitespace(document):
 
     First split on "\\\\n", then on "\\\\t", then on " ".
     :param document: document to be splited
-    :return: setence list obtained after splitting document
+    :return: sentence list obtained after splitting document
     """
     sentences = document.split('\n')
     sentences = [sentence.split('\t') for sentence in sentences]
@@ -132,11 +132,11 @@ def get_words_from_document(
     Get words from a document. Useful to compute ratios, like the
     stopwords ratio.
 
-    :param document: document that need to split words
+    :param document: document that need to split words.
     :param token_func: function of tokenizer, if specified, the function
         will be used for split document into different tokens.
-    :param new_line: whether to use `\\\\n' to split words
-    :param tab: whether to use '\\\\t' to split words
+    :param new_line: whether to use `\\\\n' to split words.
+    :param tab: whether to use '\\\\t' to split words.
     :return: word list obtained from document
     """
     if token_func:

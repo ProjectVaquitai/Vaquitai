@@ -2,7 +2,7 @@
 # data & resources
 models/
 outputs/
-# assets/
+assets/
 
 # setup
 data_juicer.egg-info/
@@ -15,11 +15,3 @@ dist
 .idea/
 wandb/
 __pycache__
-demos/data_image
-demos/data_gn*
-demos/data_bdd
-demos/data_zn
-demos/znr
-.vscode
-nohup.out
-frontend/

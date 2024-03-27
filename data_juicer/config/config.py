@@ -150,6 +150,30 @@ def init_configs(args=None):
         'default, it\'s "<__dj__image>". You can specify your own special'
         ' token according to your input dataset.')
     parser.add_argument(
+        '--audio_key',
+        type=str,
+        default='audios',
+        help='Key name of field to store the list of sample audio paths.')
+    parser.add_argument(
+        '--audio_special_token',
+        type=str,
+        default=SpecialTokens.audio,
+        help='The special token that represents an audio in the text. In '
+        'default, it\'s "<__dj__audio>". You can specify your own special'
+        ' token according to your input dataset.')
+    parser.add_argument(
+        '--video_key',
+        type=str,
+        default='videos',
+        help='Key name of field to store the list of sample video paths.')
+    parser.add_argument(
+        '--video_special_token',
+        type=str,
+        default=SpecialTokens.video,
+        help='The special token that represents a video in the text. In '
+        'default, it\'s "<__dj__video>". You can specify your own special'
+        ' token according to your input dataset.')
+    parser.add_argument(
         '--eoc_special_token',
         type=str,
         default=SpecialTokens.eoc,
@@ -407,12 +431,16 @@ def init_setup_from_cfg(cfg):
                 args = {
                     'text_key': text_key,
                     'image_key': cfg.image_key,
-                    'point_cloud_key': cfg.point_cloud_key
+                    'point_cloud_key': cfg.point_cloud_key,
+                    'audio_key': cfg.audio_key,
+                    'video_key': cfg.video_key,
                 }
             elif args['text_key'] is None:
                 args['text_key'] = text_key
                 args['image_key'] = cfg.image_key
                 args['point_cloud_key'] = cfg.point_cloud_key
+                args['audio_key'] = cfg.audio_key
+                args['video_key'] = cfg.video_key
             op[op_name] = args
 
     return cfg
@@ -553,7 +581,8 @@ def export_config(cfg,
                   overwrite=False,
                   multifile=True):
     """
-        save the config object, some params are from jsonargparse
+    Save the config object, some params are from jsonargparse
+
     :param cfg: cfg object to save (Namespace type)
     :param path: the save path
     :param format: 'yaml', 'json', 'json_indented', 'parser_mode'
@@ -586,14 +615,14 @@ def export_config(cfg,
 
 def merge_config(ori_cfg, new_cfg: Dict):
     """
-        Merge configuration from new_cfg into ori_cfg
+    Merge configuration from new_cfg into ori_cfg
 
     :param ori_cfg: the original configuration object, whose type is
-    expected as namespace from jsonargparse
+        expected as namespace from jsonargparse
     :param new_cfg: the configuration object to be merged, whose type is
-    expected as dict or namespace from jsonargparse
+        expected as dict or namespace from jsonargparse
 
-    :return cfg_after_merge
+    :return: cfg_after_merge
     """
     try:
         ori_specified_op_names = set()

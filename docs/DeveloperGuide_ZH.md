@@ -1,12 +1,12 @@
 # 开发者指南
 
-* [开发者指南](#开发者指南)
-   * [编码规范](#编码规范)
-   * [构建自己的算子](#构建自己的算子)
-      * [（可选）使新算子可以进行算子融合](#可选使新算子可以进行算子融合)
-   * [构建自己的配置](#构建自己的配置)
-      * [丰富的配置源和类型提示](#丰富的配置源和类型提示)
-      * [层次化的配置和帮助](#层次化的配置和帮助)
+- [开发者指南](#开发者指南)
+  - [编码规范](#编码规范)
+  - [构建自己的算子](#构建自己的算子)
+    - [（可选）使新算子可以进行算子融合](#可选使新算子可以进行算子融合)
+  - [构建自己的配置](#构建自己的配置)
+    - [丰富的配置源和类型提示](#丰富的配置源和类型提示)
+    - [层次化的配置和帮助](#层次化的配置和帮助)
 
 ## 编码规范
 
@@ -48,56 +48,141 @@ class StatsKeys(object):
 2. 在 `data_juicer/ops/filter/` 目录下创建一个新的算子文件 `text_length_filter.py`，内容如下：
     - 因为它是一个 Filter 算子，所以需要继承 `base_op.py` 中的 `Filter` 基类，并用 `OPERATORS` 修饰以实现自动注册。
 
-```python
-import sys
+    ```python
+    import sys
 
-from jsonargparse.typing import PositiveInt
+    from jsonargparse.typing import PositiveInt
 
-from data_juicer.utils.constant import Fields, StatsKeys
+    from data_juicer.utils.constant import Fields, StatsKeys
 
-from ..base_op import OPERATORS, Filter
+    from ..base_op import OPERATORS, Filter
 
 
-@OPERATORS.register_module('text_length_filter')
-class TextLengthFilter(Filter):
-    """Filter to keep samples with total text length within a specific
-    range."""
+    @OPERATORS.register_module('text_length_filter')
+    class TextLengthFilter(Filter):
+        """Filter to keep samples with total text length within a specific
+        range."""
 
-    def __init__(self,
-                 min_len: PositiveInt = 10,
-                 max_len: PositiveInt = sys.maxsize,
-                 *args,
-                 **kwargs):
-        """
-        Initialization method.
+        def __init__(self,
+                    min_len: PositiveInt = 10,
+                    max_len: PositiveInt = sys.maxsize,
+                    *args,
+                    **kwargs):
+            """
+            Initialization method.
 
-        :param min_len: The min text length in the filtering. samples
-            will be filtered if their text length is below this
-            parameter.
-        :param max_len: The max text length in the filtering. samples
-            will be filtered if their text length exceeds this
-            parameter.
-        :param args: extra args
-        :param kwargs: extra args
-        """
-        super().__init__(*args, **kwargs)
-        self.min_len = min_len
-        self.max_len = max_len
+            :param min_len: The min text length in the filtering. samples
+                will be filtered if their text length is below this
+                parameter.
+            :param max_len: The max text length in the filtering. samples
+                will be filtered if their text length exceeds this
+                parameter.
+            :param args: extra args
+            :param kwargs: extra args
+            """
+            super().__init__(*args, **kwargs)
+            self.min_len = min_len
+            self.max_len = max_len
 
-    def compute_stats(self, sample):
-        # check if it's computed already
-        if StatsKeys.text_len in sample[Fields.stats]:
+        def compute_stats(self, sample):
+            # check if it's computed already
+            if StatsKeys.text_len in sample[Fields.stats]:
+                return sample
+
+            sample[Fields.stats][StatsKeys.text_len] = len(sample[self.text_key])
             return sample
 
-        sample[Fields.stats][StatsKeys.text_len] = len(sample[self.text_key])
-        return sample
+        def process(self, sample):
+            if self.min_len <= sample[Fields.stats][StatsKeys.text_len] <= self.max_len:
+                return True
+            else:
+                return False
+    ```
 
-    def process(self, sample):
-        if self.min_len <= sample[Fields.stats][StatsKeys.text_len] <= self.max_len:
-            return True
-        else:
-            return False
-```
+    - 如果在算子中使用了 Hugging Face 模型，您可能希望利用 GPU 加速。为了实现这一点，请在构造函数中声明 `self._accelerator = 'cuda'`，并确保 `compute_stats` 和 `process` 方法接受一个额外的位置参数 `rank`。
+
+    ```python
+    # ... (same as above)
+
+    @OPERATORS.register_module('text_length_filter')
+    class TextLengthFilter(Filter):
+        def __init__(self,
+                    min_len: PositiveInt = 10,
+                    max_len: PositiveInt = sys.maxsize,
+                    *args,
+                    **kwargs):
+            # ... (same as above)
+            self._accelerator = 'cuda'
+
+        def compute_stats(self, sample, rank=None):
+            # ... (same as above)
+
+        def process(self, sample, rank=None):
+            # ... (same as above)
+    ```
+
+    - 如果算子批量处理数据，输入不是一个样本而是一个batch，需要声明`self._batched_op = True`。
+    ```python
+    # ... (import some other libraries)
+    OP_NAME = 'image_diffusion_mapper'
+    @OPERATORS.register_module(OP_NAME)
+    @LOADED_IMAGES.register_module(OP_NAME)
+    class ImageDiffusionMapper(Mapper):
+        def __init__(self,
+                 # ... (OP parameters)
+                 *args,
+                 **kwargs):
+            super().__init__(*args, **kwargs)
+            self._batched_op = True
+
+        def process(self, samples):
+            # ... (some codes)
+    ```
+
+    - 在mapper算子中，我们提供了产生额外数据的存储路径生成接口，避免出现进程冲突和数据覆盖的情况。生成的存储路径格式为`{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`，其中`HASH_VALUE`是算子初始化参数、每个样本中相关参数、进程ID和时间戳的哈希值。为了方便，可以在OP类初始化开头调用`self.remove_extra_parameters(locals())`获取算子初始化参数，同时可以调用`self.add_parameters`添加每个样本与生成额外数据相关的参数。例如，利用diffusion模型对图像进行增强的算子：
+    ```python
+    # ... (import some library)
+    OP_NAME = 'image_diffusion_mapper'
+    @OPERATORS.register_module(OP_NAME)
+    @LOADED_IMAGES.register_module(OP_NAME)
+    class ImageDiffusionMapper(Mapper):
+        def __init__(self,
+                 # ... (OP parameters)
+                 *args,
+                 **kwargs):
+            super().__init__(*args, **kwargs)
+            self._init_parameters = self.remove_extra_parameters(locals())
+
+        def process(self, sample):
+            # ... (some codes)
+            # captions[index] is the prompt for diffusion model
+            related_parameters = self.add_parameters(
+                    self._init_parameters, caption=captions[index])
+            new_image_path = transfer_filename(
+                    origin_image_path, OP_NAME, **related_parameters)
+            # ... (some codes)
+    ```
+    针对一个数据源衍生出多个额外数据的情况，我们允许在生成的存储路径后面再加后缀。比如，根据关键帧将视频拆分成多个视频：
+    ```python
+    # ... (import some library)
+    OP_NAME = 'video_split_by_key_frame_mapper'
+    @OPERATORS.register_module(OP_NAME)
+    @LOADED_VIDEOS.register_module(OP_NAME)
+    class VideoSplitByKeyFrameMapper(Mapper):
+        def __init__(self,
+                 # ... (OP parameters)
+                 *args,
+                 **kwargs):
+            super().__init__(*args, **kwargs)
+            self._init_parameters = self.remove_extra_parameters(locals())
+
+        def process(self, sample):
+            # ... (some codes)
+            split_video_path = transfer_filename(
+                        original_video_path, OP_NAME, **self._init_parameters)
+            split_video_path = add_suffix_to_filename(split_video_path, f'_{count}')
+            # ... (some codes)
+    ```
 
 3. 实现后，将其添加到 `data_juicer/ops/filter` 目录下 `__init__.py` 文件中的算子字典中：
 
@@ -125,8 +210,10 @@ process:
 ```python
 import unittest
 from data_juicer.ops.filter.text_length_filter import TextLengthFilter
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-class TextLengthFilterTest(unittest.TestCase):
+
+class TextLengthFilterTest(DataJuicerTestCaseBase):
 
     def test_func1(self):
         pass
@@ -136,6 +223,9 @@ class TextLengthFilterTest(unittest.TestCase):
 
     def test_func3(self):
         pass
+        
+if __name__ == '__main__':
+    unittest.main()
 ```
 
 6. （强烈推荐）为了方便其他用户使用，我们还需要将新增的算子信息更新到相应的文档中，具体包括如下文档：
@@ -177,6 +267,8 @@ class TextLengthFilterTest(unittest.TestCase):
    ```
 
    3. `docs/Operators_ZH.md`：该文档为6.ii中`docs/Operators.md`文档的中文版，需要更新相同位置处的中文内容。
+
+   4. `docs/sphinx_doc/source/data_juicer.ops.{filter | mapper | deduplicator | selector}.rst`: 该文档为 API 文档索引，在修改算子文件名称或增删算子文件的情况下需要对应更新文件中对应的条目。
 
 ### （可选）使新算子可以进行算子融合
 
@@ -229,9 +321,7 @@ class WordNumFilter(Filter):
 ```python
 # 修改计算逻辑前
 ...
-tokenizer = get_model(self.model_key,
-                      lang=self.lang,
-                      model_type='sentencepiece')
+tokenizer = get_model(self.model_key)
 words = get_words_from_document(
     sample[self.text_key],
     token_func=tokenizer.encode_as_pieces if tokenizer else None)
@@ -245,15 +335,13 @@ if context and words_key in sample[Fields.context]:
     words = sample[Fields.context][words_key]
 else:
     # 正常计算流程
+<<<<<<< HEAD
     tokenizer = get_model(self.model_key,
                           lang=self.lang,
                           model_type='sentencepiece')
-    words = get_words_from_document(
-        sample[self.text_key],
-        token_func=tokenizer.encode_as_pieces if tokenizer else None)
-    if context:
+=======
+    tokenizer = get_model(self.model_key)
         # 第一次计算该中间变量后，放入context供后续算子使用
-        sample[Fields.context][words_key] = words
 ...
 ```
 

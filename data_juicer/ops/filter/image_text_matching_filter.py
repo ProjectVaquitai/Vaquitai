@@ -4,8 +4,8 @@ from PIL import ImageOps
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import (SpecialTokens, load_image,
-                                        remove_special_tokens)
+from data_juicer.utils.mm_utils import (SpecialTokens, load_data_with_context,
+                                        load_image, remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
@@ -68,12 +68,14 @@ class ImageTextMatchingFilter(Filter):
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
-        self.model_key = prepare_model(model_type='hf_blip', model_key=hf_blip)
+        self.model_key = prepare_model(model_type='huggingface',
+                                       pretrained_model_name_or_path=hf_blip)
+        self._accelerator = 'cuda'
         self.reduce_mode = reduce_mode
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.image_text_matching_score in sample[Fields.stats]:
             return sample
@@ -87,25 +89,13 @@ class ImageTextMatchingFilter(Filter):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        images = {}
-        for loaded_image_key in loaded_image_keys:
-            if context and loaded_image_key in sample[Fields.context]:
-                # load from context
-                images[loaded_image_key] = sample[
-                    Fields.context][loaded_image_key]
-            else:
-                if loaded_image_key not in images:
-                    # avoid load the same images
-                    image = load_image(loaded_image_key)
-                    images[loaded_image_key] = image
-                    if context:
-                        # store the image data into context
-                        sample[Fields.context][loaded_image_key] = image
+        sample, images = load_data_with_context(sample, context,
+                                                loaded_image_keys, load_image)
 
         text = sample[self.text_key]
         offset = 0
         matching_scores = []
-        model, processor = get_model(self.model_key)
+        model, processor = get_model(self.model_key, rank=rank)
 
         for chunk in text.split(SpecialTokens.eoc):
             count = chunk.count(SpecialTokens.image)
@@ -130,7 +120,7 @@ class ImageTextMatchingFilter(Filter):
                                    truncation=True,
                                    max_length=model.config.text_config.
                                    max_position_embeddings,
-                                   padding=True)
+                                   padding=True).to(model.device)
 
                 outputs = model(**inputs)
                 itm_scores = outputs.itm_score.detach().cpu().softmax(
@@ -150,7 +140,7 @@ class ImageTextMatchingFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process(self, sample, rank=None):
         itm_scores = sample[Fields.stats][StatsKeys.image_text_matching_score]
         if len(itm_scores) <= 0:
             return True

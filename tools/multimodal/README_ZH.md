@@ -4,7 +4,57 @@
 
 ## 数据集格式转换
 
-由于不同多模态数据集和工作之间的数据集格式差异较大，Data-Juicer 提出了一种新颖的多模态数据集中间格式，并为一些流行的多模态工作提供了若干数据集格式转换工具。
+由于不同多模态数据集和工作之间的数据集格式差异较大， Data-Juicer 提出了一种新颖的、中间的、
+基于文本的、交替的多模态数据格式，主要基于一些按块（chunk）组织的格式，如MMC4数据集格式。
+
+在 Data-Juicer 的格式中，一个多模态样本或者文档基于一段文本组织，其由若干个文本块组成。
+每个文本块是一个语义单元，单个文本块中包括的所有多模态信息都应该在谈论同样的事情，并且它们彼此语义上是对齐的。
+
+下面这里是一个 Data-Juicer 格式的多模态样本示例。
+- 它包括4个文本块，它们由特殊token `<|__dj__eoc|>` 分割开。
+- 除了文本，这个样本还包括3种其他模态：图像（images），音频（audios），视频（videos）。
+它们保存在硬盘上，而它们的硬盘路径列举在了样本中对应的一级字段的列表里。
+- 在文本中，其他模态被表示为了特殊token（例如，图像 -- `<__dj__image>`）。
+每种模态的特殊token所表示的数据按照它们在文本中出现的顺序对应到列表中的路径上。
+（例如，第3个文本块中的2个图像token分别对应了图像路径列表中的antarctica_map图像和europe_map图像）
+- 在单个文本块中，可以由多种模态的数据以及多个模态特殊token，它们彼此是语义上对齐的，而且它们与该文本块中的文本也是语义对齐的。
+这些模态特殊token在文本块中可以处于任意位置（通常处于文本前或者文本后）
+- 不同于纯文本样本，对于多模态样本来说，为其他模态计算的stats可能为针对多模态数据列表的一个stats列表（如例子中的image_widths）。
+
+```python
+{
+  "text": "<__dj__image> Antarctica is Earth's southernmost and least-populated continent. <|__dj__eoc|> "
+          "<__dj__video> <__dj__audio> Situated almost entirely south of the Antarctic Circle and surrounded by the "
+          "Southern Ocean (also known as the Antarctic Ocean), it contains the geographic South Pole. <|__dj__eoc|> "
+          "Antarctica is the fifth-largest continent, being about 40% larger than Europe, "
+          "and has an area of 14,200,000 km2 (5,500,000 sq mi). <__dj__image> <__dj__image> <|__dj__eoc|> "
+          "Most of Antarctica is covered by the Antarctic ice sheet, "
+          "with an average thickness of 1.9 km (1.2 mi). <|__dj__eoc|>",
+  "images": [
+    "path/to/the/image/of/antarctica_snowfield",
+    "path/to/the/image/of/antarctica_map",
+    "path/to/the/image/of/europe_map"
+  ],
+  "audios": [
+    "path/to/the/audio/of/sound_of_waves_in_Antarctic_Ocean"
+  ],
+  "videos": [
+    "path/to/the/video/of/remote_sensing_view_of_antarctica"
+  ],
+  "meta": {
+    "src": "customized",
+    "version": "0.1",
+    "author": "xxx"
+  },
+  "stats": {
+    "lang": "en",
+    "image_widths": [224, 336, 512],
+    ...
+  }
+}
+```
+
+根据这个格式，Data-Juicer 为一些流行的多模态工作提供了若干数据集格式转换工具。
 
 这些工具分为两种类型：
 - 其他格式到 Data-Juicer 格式的转换：这些工具在 `source_format_to_data_juicer_format` 目录中。它们可以帮助将其他格式的数据集转换为 Data-Juicer 格式的目标数据集。
@@ -12,11 +62,14 @@
 
 目前，Data-Juicer 支持的数据集格式在下面表格中列出。
 
-| 格式       | source_format_to_data_juicer_format | data_juicer_format_to_target_format | 格式参考                                                                                               |
-|----------|-------------------------------------|-------------------------------------|----------------------------------------------------------------------------------------------------|
-| 类LLaVA格式 | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [格式描述](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
-| 类MMC4格式  | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [格式描述](https://github.com/allenai/mmc4#documents) |
-| 类WavCaps格式  | `wavcaps_to_dj.py`                    | `dj_to_wavcaps.py`                    | [格式描述](https://github.com/XinhaoMei/WavCaps#table-of-contents) |
+| 格式               | 类型    | source_format_to_data_juicer_format | data_juicer_format_to_target_format | 格式参考                                                                                               |
+|------------------|-------|-------------------------------------|-------------------------------------|----------------------------------------------------------------------------------------------------|
+| 类LLaVA格式         | 图像-文本 | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [格式描述](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
+| 类MMC4格式          | 图像-文本 | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [格式描述](https://github.com/allenai/mmc4#documents)                                                  |
+| 类WavCaps格式       | 音频-文本 | `wavcaps_to_dj.py` | `dj_to_wavcaps.py`                  | [格式描述](https://github.com/XinhaoMei/WavCaps#table-of-contents)                                     |
+| 类Video-ChatGPT格式 |视频-文本 | `video_chatgpt_to_dj.py`            | `dj_to_video_chatgpt.py`                | [格式描述]( https://github.com/mbzuai-oryx/Video-ChatGPT/tree/main/data)                               |                                                                                          |
+| 类Youku-mPLUG格式   | 视频-文本 | `youku_to_dj.py`                    | `dj_to_youku.py`                    | [格式描述](https://modelscope.cn/datasets/modelscope/Youku-AliceMind/summary)                          |                                                                                          |
+| 类InternVid格式     | 视频-文本 | `internvid_to_dj.py`                | `dj_to_internvid.py`                | [格式描述](https://huggingface.co/datasets/OpenGVLab/InternVid)                                        |                                                                                          |
 
 对于所有工具，您可以运行以下命令来了解它们的详细用法：
 
@@ -118,3 +171,33 @@ python tools/multimodal/source_format_to_data_juicer_format/llava_to_dj.py --hel
         "tags": "" }]    
 }
 ```
+
+#### 类Video-ChatGPT格式
+Video-ChatGPT数据集包含3种统一格式的数据：
+- 视频摘要主题
+- 基于描述的问题答案（探索空间、时间、关系和推理概念）；
+- 以及创意/生成性问题解答。
+它们都遵循“<question,answer,video_id>”格式，其中“video_id”表示为YouTube视频的id：“v_youtube_id”。 我们假设用户已经下载了这些视频，在使用转换工具时需要指定相应的存储目录。
+
+#### 类Youku-mPLUG格式
+
+Youku-mPLUG数据集中一共有4种类型的格式：pretrain，classification，
+retrieval，captioning。它们在字段名称或者其他属性上会有轻微的差异，但是所有类型都遵从 `<video, caption>` 的格式。
+
+#### 类InternVid格式
+
+InternVid数据集包括4个字段：
+- `YoutubeID`: 样本中使用的视频的Youtube ID。我们假设用户已经下载了这些视频，
+并且这个字段已经被替换为了视频的存储路径。
+- `Start_timestamp`: 与caption对应的视频片段的开始时间戳字符串。
+- `End_timestamp`: 与caption对应的视频片段的结束时间戳字符串
+- `Caption`: 与视频片段对应的caption。
+
+正如我们看到，该数据集中的caption对应到了一段由开始/结束时间戳指定的视频片段，而非整段视频。
+因此，如果 `cut_videos` 参数设置为 True，针对该数据集的转换工具会为您剪辑出指定的视频片段。
+您也可以在转换前自行对下载的视频进行剪辑。
+
+#### 类MSR-VTT格式
+MSR-VTT数据集包含多个字段，主要用到2个字段：
+- `video_id`: 样本中使用的视频的文件名，未包含文件后缀。我们假设用户已经下载了这些视频。
+- `caption`: 与视频对应的caption。

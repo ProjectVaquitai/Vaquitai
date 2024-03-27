@@ -5,8 +5,62 @@ This folder contains some scripts and tools for multimodal datasets before and a
 ## Dataset Format Conversion
 
 Due to large format diversity among different multimodal datasets and works, 
-Data-Juicer propose a novel intermediate format for multimodal dataset and 
-provided several dataset format conversion tools for some popular multimodal 
+Data-Juicer propose a novel intermediate text-based interleaved data format for multimodal dataset, which 
+is based on chunk-wise formats such MMC4 dataset.
+
+In the Data-Juicer format, a multimodal sample or document is based on a text, 
+which consists of several text chunks. Each chunk is a semantic unit, and all the
+multimodal information in a chunk should talk about the same thing and be aligned
+with each other.
+
+Here is a multimodal sample example in Data-Juicer format below.
+- It includes 4 chunks split by the special token `<|__dj__eoc|>`.
+- In addition to texts, there are 3 other modalities: images, audios, videos. 
+They are stored on the disk and their paths are
+listed in the corresponding first-level fields in the sample.
+- Other modalities are represented as special tokens in the text (e.g. image -- `<__dj__image>`). 
+The special tokens of each modality correspond to the paths in the order of appearance. 
+(e.g. the two image tokens in the third chunk are images of antarctica_map and europe_map respectively)
+- There could be multiple types of modalities and multiple modality special tokens in a single chunk, 
+and they are semantically aligned with each other and text in this chunk. 
+The position of special tokens can be random in a chunk. (In general, they are usually before or after the text.)
+- For multimodal samples, unlike text-only samples, the computed stats for other 
+modalities could be a list of stats for the list of multimodal data (e.g. image_widths in this sample).
+
+```python
+{
+  "text": "<__dj__image> Antarctica is Earth's southernmost and least-populated continent. <|__dj__eoc|> "
+          "<__dj__video> <__dj__audio> Situated almost entirely south of the Antarctic Circle and surrounded by the "
+          "Southern Ocean (also known as the Antarctic Ocean), it contains the geographic South Pole. <|__dj__eoc|> "
+          "Antarctica is the fifth-largest continent, being about 40% larger than Europe, "
+          "and has an area of 14,200,000 km2 (5,500,000 sq mi). <__dj__image> <__dj__image> <|__dj__eoc|> "
+          "Most of Antarctica is covered by the Antarctic ice sheet, "
+          "with an average thickness of 1.9 km (1.2 mi). <|__dj__eoc|>",
+  "images": [
+    "path/to/the/image/of/antarctica_snowfield",
+    "path/to/the/image/of/antarctica_map",
+    "path/to/the/image/of/europe_map"
+  ],
+  "audios": [
+    "path/to/the/audio/of/sound_of_waves_in_Antarctic_Ocean"
+  ],
+  "videos": [
+    "path/to/the/video/of/remote_sensing_view_of_antarctica"
+  ],
+  "meta": {
+    "src": "customized",
+    "version": "0.1",
+    "author": "xxx"
+  },
+  "stats": {
+    "lang": "en",
+    "image_widths": [224, 336, 512],
+    ...
+  }
+}
+```
+
+According to this format, Data-Juicer provided several dataset format conversion tools for some popular multimodal 
 works.
 
 These tools consist of two types:
@@ -15,11 +69,15 @@ These tools consist of two types:
 
 For now, dataset formats that are supported by Data-Juicer are listed in the following table.
 
-| Format     | source_format_to_data_juicer_format | data_juicer_format_to_target_format | Ref.                                                                                                             |
-|------------|-------------------------------------|-------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| LLaVA-like | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [Format Description](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
-| MMC4-like  | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [Format Description](https://github.com/allenai/mmc4#documents)                                                  |
-| WavCaps-like  | `wavcaps_to_dj.py`                    | `dj_to_wavcaps.py`                    | [Format Description](https://github.com/XinhaoMei/WavCaps#table-of-contents) |
+| Format             | Type       | source_format_to_data_juicer_format | data_juicer_format_to_target_format | Ref.                                                                                                             |
+|--------------------|------------|-------------------------------------|-------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| LLaVA-like         | image-text | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [Format Description](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
+| MMC4-like          | image-text | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [Format Description](https://github.com/allenai/mmc4#documents)                                                  |
+| WavCaps-like       | audio-text | `wavcaps_to_dj.py`                  | `dj_to_wavcaps.py`                  | [Format Description](https://github.com/XinhaoMei/WavCaps#table-of-contents)                                     |
+| Video-ChatGPT-like | video-text | `video_chatgpt_to_dj.py`            | `dj_to_video_chatgpt.py`                | [Format Description]( https://github.com/mbzuai-oryx/Video-ChatGPT/tree/main/data)                                                                                           |                                                                                          |
+| Youku-mPLUG-like   | video-text | `youku_to_dj.py`                    | `dj_to_youku.py`                    | [Format Description](https://modelscope.cn/datasets/modelscope/Youku-AliceMind/summary)                          |                                                                                          |
+| InternVid-like     | video-text | `internvid_to_dj.py`                | `dj_to_internvid.py`                | [Format Description](https://huggingface.co/datasets/OpenGVLab/InternVid)                                        |                                                                                          |
+
 
 For all tools, you can run the following command to find out the usage of them:
 
@@ -107,7 +165,7 @@ Users should be cautious about this point if you need this matrix in later usage
 
 Despite these extra fields, tools for MMC4 can perfectly convert MMC4-like datasets to Data-Juicer-format datasets and convert them back~
 
-### WavCaps-like
+#### WavCaps-like
 
 The [WavCaps](https://github.com/XinhaoMei/WavCaps#dataset) is composed of four sub-datasets: [FreeSound](https://freesound.org/), [BBC Sound Effects](https://sound-effects.bbcrewind.co.uk/),[SoundBible](https://soundbible.com/) and [AudioSet Strongly-labelled Subset](https://research.google.com/audioset/download_strong.html). Each sub-dataset has different fields. For example, the 'description' field is included in SoundBible, but does not exist in AudioSet. To ensure that the different sub-datasets can be properly merged after conversion, the union of all fields from the sub-datasets is used during the wavcaps_to_dj stage, and all fields are fully retained during the dj_to_wavcaps stage.
 
@@ -142,3 +200,41 @@ The [WavCaps](https://github.com/XinhaoMei/WavCaps#dataset) is composed of four 
         "tags": "" }]    
 }
 ```
+
+#### Video-ChatGPT-like
+
+The Video-ChatGPT dataset contains 3 types of data with unified format:
+- Topics for Video summarization
+- Description-based question-answers (exploring spatial, temporal, relationships, and reasoning concepts);
+- and Creative/generative question-answers.
+They all obey the `<question, answer, video_id>` format, where the `video_id` is in the form "v_youtube_id". We suppose that users have downloaded these videos already, and they need to specify the corresponding storage directory when using the converter tool.
+
+
+
+#### Youku-mPLUG-like
+
+The Youku-mPLUG dataset contains 4 types of format: pretrain, classification, retrieval, captioning. 
+They are slightly different from each other in field name or other attributes, but all of them obey the `<video, caption>` format.
+
+#### InternVid-like
+
+The InternVid dataset contains 4 fields:
+- `YoutubeID`: the Youtube ID of the video used in the sample. 
+We suppose that users have downloaded these videos already
+and this field is replaced with its storage path.
+- `Start_timestamp`: the start timestamp in string of the video clip for the 
+corresponding caption.
+- `End_timestamp`: the end timestamp in string of the video clip for the 
+corresponding caption.
+- `Caption`: the corresponding caption for the video clip.
+
+As we can see, the caption in this dataset corresponds to the video clip 
+specified by the start/end timestamps instead of the whole video. So the 
+conversion tool will cut the specified video clip for you if the argument 
+`cut_videos` is set to True. You can cut before conversion by yourself as well.
+
+#### MSR-VTT-like
+MSR-VTT dataset contains multiple fields, here we use 2 fields:
+- `video_id`: the video file name without suffix used in the sample. 
+We suppose that users have downloaded these videos already。
+- `caption`: the corresponding caption for the video.

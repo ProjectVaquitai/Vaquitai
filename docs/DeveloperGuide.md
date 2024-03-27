@@ -1,12 +1,12 @@
 # How-to Guide for Developers
 
-* [How-to Guide for Developers](#how-to-guide-for-developers)
-   * [Coding Style](#coding-style)
-   * [Build your own OPs](#build-your-own-ops)
-      * [(Optional) Make your OP fusible](#optional-make-your-op-fusible)
-   * [Build your own configs](#build-your-own-configs)
-      * [Fruitful config sources &amp; Type hints](#fruitful-config-sources--type-hints)
-      * [Hierarchical configs and helps](#hierarchical-configs-and-helps)
+- [How-to Guide for Developers](#how-to-guide-for-developers)
+  - [Coding Style](#coding-style)
+  - [Build your own OPs](#build-your-own-ops)
+    - [(Optional) Make your OP fusible](#optional-make-your-op-fusible)
+  - [Build your own configs](#build-your-own-configs)
+    - [Fruitful config sources \& Type hints](#fruitful-config-sources--type-hints)
+    - [Hierarchical configs and helps](#hierarchical-configs-and-helps)
 
 ## Coding Style
 
@@ -53,56 +53,143 @@ class StatsKeys(object):
 2. Create a new OP file `text_length_filter.py` in the corresponding `data_juicer/ops/filter/` directory as follows.
    - Because it's a Filter OP, so the new OP needs to inherit from the basic `Filter` class in the `base_op.py`, and be decorated with `OPERATORS` to register itself automatically.
 
-```python
-import sys
+    ```python
+    import sys
 
-from jsonargparse.typing import PositiveInt
+    from jsonargparse.typing import PositiveInt
 
-from data_juicer.utils.constant import Fields, StatsKeys
+    from data_juicer.utils.constant import Fields, StatsKeys
 
-from ..base_op import OPERATORS, Filter
+    from ..base_op import OPERATORS, Filter
 
 
-@OPERATORS.register_module('text_length_filter')
-class TextLengthFilter(Filter):
-    """Filter to keep samples with total text length within a specific
-    range."""
+    @OPERATORS.register_module('text_length_filter')
+    class TextLengthFilter(Filter):
+        """Filter to keep samples with total text length within a specific
+        range."""
 
-    def __init__(self,
-                 min_len: PositiveInt = 10,
-                 max_len: PositiveInt = sys.maxsize,
-                 *args,
-                 **kwargs):
-        """
-        Initialization method.
+        def __init__(self,
+                    min_len: PositiveInt = 10,
+                    max_len: PositiveInt = sys.maxsize,
+                    *args,
+                    **kwargs):
+            """
+            Initialization method.
 
-        :param min_len: The min text length in the filtering. samples
-            will be filtered if their text length is below this
-            parameter.
-        :param max_len: The max text length in the filtering. samples
-            will be filtered if their text length exceeds this
-            parameter.
-        :param args: extra args
-        :param kwargs: extra args
-        """
-        super().__init__(*args, **kwargs)
-        self.min_len = min_len
-        self.max_len = max_len
+            :param min_len: The min text length in the filtering. samples
+                will be filtered if their text length is below this
+                parameter.
+            :param max_len: The max text length in the filtering. samples
+                will be filtered if their text length exceeds this
+                parameter.
+            :param args: extra args
+            :param kwargs: extra args
+            """
+            super().__init__(*args, **kwargs)
+            self.min_len = min_len
+            self.max_len = max_len
 
-    def compute_stats(self, sample):
-        # check if it's computed already
-        if StatsKeys.text_len in sample[Fields.stats]:
+        def compute_stats(self, sample):
+            # check if it's computed already
+            if StatsKeys.text_len in sample[Fields.stats]:
+                return sample
+
+            sample[Fields.stats][StatsKeys.text_len] = len(sample[self.text_key])
             return sample
 
-        sample[Fields.stats][StatsKeys.text_len] = len(sample[self.text_key])
-        return sample
+        def process(self, sample):
+            if self.min_len <= sample[Fields.stats][StatsKeys.text_len] <= self.max_len:
+                return True
+            else:
+                return False
+    ```
 
-    def process(self, sample):
-        if self.min_len <= sample[Fields.stats][StatsKeys.text_len] <= self.max_len:
-            return True
-        else:
-            return False
-```
+    - If Hugging Face models are used within an operator, you might want to leverage GPU acceleration. To achieve this, declare `self._accelerator = 'cuda'` in the constructor, and ensure that `compute_stats` and `process` methods accept an additional positional argument `rank`.
+
+    ```python
+    # ... (same as above)
+
+    @OPERATORS.register_module('text_length_filter')
+    class TextLengthFilter(Filter):
+        def __init__(self,
+                    min_len: PositiveInt = 10,
+                    max_len: PositiveInt = sys.maxsize,
+                    *args,
+                    **kwargs):
+            # ... (same as above)
+            self._accelerator = 'cuda'
+
+        def compute_stats(self, sample, rank=None):
+            # ... (same as above)
+
+        def process(self, sample, rank=None):
+            # ... (same as above)
+    ```
+
+    - If the operator processes data in batches rather than a single sample, it is necessary to declare `self._batched_op = True`.
+    ```python
+    # ... (import some other libraries)
+    OP_NAME = 'image_diffusion_mapper'
+    @OPERATORS.register_module(OP_NAME)
+    @LOADED_IMAGES.register_module(OP_NAME)
+    class ImageDiffusionMapper(Mapper):
+        def __init__(self,
+                 # ... (OP parameters)
+                 *args,
+                 **kwargs):
+            super().__init__(*args, **kwargs)
+            self._batched_op = True
+
+        def process(self, samples):
+            # ... (some codes)
+    ```
+
+    - In a mapper operator, to avoid process conflicts and data coverage, we offer an interface to make a saving path for produced extra datas. The format of the saving path is `{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`, where the `HASH_VALUE` is hashed from the init parameters of the operator, the related parameters in each sample, the process ID, and the timestamp. For convenience, we can call `self.remove_extra_parameters(locals())` at the beginning of the initiation to get the init parameters. At the same time, we can call `self.add_parameters` to add related parameters with the produced extra datas from each sample. Take the operator which enhances the images with diffusion models as example:
+    ```python
+    from data_juicer.utils.file_utils import transfer_filename
+    # ... (import some other libraries)
+    OP_NAME = 'image_diffusion_mapper'
+    @OPERATORS.register_module(OP_NAME)
+    @LOADED_IMAGES.register_module(OP_NAME)
+    class ImageDiffusionMapper(Mapper):
+        def __init__(self,
+                 # ... (OP parameters)
+                 *args,
+                 **kwargs):
+            super().__init__(*args, **kwargs)
+            self._init_parameters = self.remove_extra_parameters(locals())
+
+        def process(self, sample):
+            # ... (some codes)
+            # captions[index] is the prompt for diffusion model
+            related_parameters = self.add_parameters(
+                    self._init_parameters, caption=captions[index])
+            new_image_path = transfer_filename(
+                    origin_image_path, OP_NAME, **related_parameters)
+            # ... (some codes)
+    ```
+    For the mapper to produce multi extra datas base on one origin data, we can add suffix at the saving path. Take the operator which splits videos according to their key frames as example:
+    ```python
+    from data_juicer.utils.file_utils import add_suffix_to_filename, transfer_filename
+    # ... (import some other libraries)
+    OP_NAME = 'video_split_by_key_frame_mapper'
+    @OPERATORS.register_module(OP_NAME)
+    @LOADED_VIDEOS.register_module(OP_NAME)
+    class VideoSplitByKeyFrameMapper(Mapper):
+        def __init__(self,
+                 # ... (OP parameters)
+                 *args,
+                 **kwargs):
+            super().__init__(*args, **kwargs)
+            self._init_parameters = self.remove_extra_parameters(locals())
+
+        def process(self, sample):
+            # ... (some codes)
+            split_video_path = transfer_filename(
+                        original_video_path, OP_NAME, **self._init_parameters)
+            split_video_path = add_suffix_to_filename(split_video_path,  f'_{count}')
+            # ... (some codes)
+    ```
 
 3. After implemention, add it to the OP dictionary in the `__init__.py` file in `data_juicer/ops/filter/` directory.
 
@@ -129,8 +216,9 @@ process:
 ```python
 import unittest
 from data_juicer.ops.filter.text_length_filter import TextLengthFilter
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-class TextLengthFilterTest(unittest.TestCase):
+class TextLengthFilterTest(DataJuicerTestCaseBase):
 
     def test_func1(self):
         pass
@@ -140,6 +228,9 @@ class TextLengthFilterTest(unittest.TestCase):
 
     def test_func3(self):
         pass
+
+if __name__ == '__main__':
+    unittest.main()
 ```
 
 6. (Strongly Recommend) In order to facilitate the use of other users, we also need to update this new OP information to
@@ -187,6 +278,8 @@ the corresponding documents, including the following docs:
 
    3. `docs/Operators_ZH.md`: this doc is the Chinese version of the doc in 6.ii, so we need to update the Chinese content at
    the same positions.
+
+   4. `docs/sphinx_doc/source/data_juicer.ops.{filter | mapper | deduplicator | selector}.rst`: this doc is the index of API reference. When the operator file name is modified or an operator file is added or deleted, the corresponding entries in the file need to be updated accordingly.
 
 ### (Optional) Make your OP fusible
 
@@ -249,9 +342,7 @@ class WordNumFilter(Filter):
 ```python
 # before modification
 ...
-tokenizer = get_model(self.model_key,
-                      lang=self.lang,
-                      model_type='sentencepiece')
+tokenizer = get_model(self.model_key)
 words = get_words_from_document(
     sample[self.text_key],
     token_func=tokenizer.encode_as_pieces if tokenizer else None)
@@ -265,9 +356,7 @@ if context and words_key in sample[Fields.context]:
     words = sample[Fields.context][words_key]
 else:
     # normal calculation process
-    tokenizer = get_model(self.model_key,
-                          lang=self.lang,
-                          model_type='sentencepiece')
+    tokenizer = get_model(self.model_key)
     words = get_words_from_document(
         sample[self.text_key],
         token_func=tokenizer.encode_as_pieces if tokenizer else None)

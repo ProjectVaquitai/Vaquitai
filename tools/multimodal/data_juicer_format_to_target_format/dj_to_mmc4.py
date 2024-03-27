@@ -128,7 +128,7 @@ def main(
         Data-Juicer, such as "images", "text", ... Default: False.
     :param convert_to_relative_paths: whether convert the image paths in this
         dataset to relative paths to the original dataset. If it's True, an
-        extra argument original_llava_ds_path is required. When the processed
+        extra argument original_mmc4_ds_path is required. When the processed
         and converted dataset will be used in another machine, it's better to
         set this argument to True. Default: False.
     :param original_mmc4_ds_path: path to the original unprocessed MMC4
@@ -157,7 +157,7 @@ def main(
             f'the target dataset.')
         os.makedirs(os.path.dirname(target_mmc4_ds_path))
 
-    # if convert_to_relative_paths is True, check if the original_llava_ds_path
+    # if convert_to_relative_paths is True, check if the original_mmc4_ds_path
     # is provided as well.
     if convert_to_relative_paths:
         if not original_mmc4_ds_path:
@@ -233,31 +233,32 @@ def main(
 
                     # remove possible image_special_token and update
                     # matched_text_index for corresponding image_info
-                    found_image = False
-                    if sent.startswith(image_special_token):
+                    found_image_num = 0
+                    while sent.startswith(image_special_token):
                         sent = sent[len(image_special_token):].strip()
-                        found_image = True
+                        found_image_num += 1
                         if sent.startswith(sent_seperator):
                             sent = sent[len(sent_seperator):].strip()
-                    elif sent.endswith(image_special_token):
+                    while sent.endswith(image_special_token):
                         sent = sent[:-len(image_special_token)].strip()
-                        found_image = True
+                        found_image_num += 1
                         if sent.endswith(sent_seperator):
                             sent = sent[:-len(sent_seperator)].strip()
                     sentences.append(sent)
-                    if found_image:
-                        if curr_image_idx < len(image_infos):
-                            image_infos[curr_image_idx][
-                                'matched_text_index'] = text_idx
-                            curr_image_idx += 1
-                        else:
-                            # if there are extra images, just skip them and
-                            # report a warning
-                            logger.warning(f'Sample with line number '
-                                           f'[{line_num}] contains unaligned '
-                                           f'numbers of images and image '
-                                           f'tokens. Please check and retry '
-                                           f'if needed.')
+                    if found_image_num > 0:
+                        for _ in range(found_image_num):
+                            if curr_image_idx < len(image_infos):
+                                image_infos[curr_image_idx][
+                                    'matched_text_index'] = text_idx
+                                curr_image_idx += 1
+                            else:
+                                # if there are extra images, just skip them and
+                                # report a warning
+                                logger.warning(f'Sample with line number '
+                                               f'[{line_num}] contains '
+                                               f'unaligned numbers of images '
+                                               f'and image tokens. Please '
+                                               f'check and retry if needed.')
 
                 # convert image_name to relative paths
                 if convert_to_relative_paths:

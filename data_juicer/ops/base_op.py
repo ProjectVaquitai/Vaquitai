@@ -1,3 +1,6 @@
+import copy
+
+from data_juicer.utils.mm_utils import size_to_bytes
 from data_juicer.utils.registry import Registry
 
 OPERATORS = Registry('Operators')
@@ -5,12 +8,7 @@ OPERATORS = Registry('Operators')
 
 class OP:
 
-    def __init__(
-        self,
-        text_key: str = None,
-        image_key: str = None,
-        point_cloud_key: str = None
-    ):
+    def __init__(self, *args, **kwargs):
         """
         Base class of operators.
 
@@ -18,17 +16,23 @@ class OP:
             to be processed.
         :param image_key: the key name of field that stores sample image list
             to be processed
+        :param audio_key: the key name of field that stores sample audio list
+            to be processed
+        :param video_key: the key name of field that stores sample video list
+            to be processed
         """
         # init data keys
-        if text_key is None:
-            text_key = 'text'
-        self.text_key = text_key
-        if image_key is None:
-            image_key = 'image'
-        self.image_key = image_key
-        if point_cloud_key is None:
-            point_cloud_key = 'point_clouds'
-        self.point_cloud_key = point_cloud_key
+        self.text_key = kwargs.get('text_key', 'text')
+        self.image_key = kwargs.get('image_key', 'images')
+        self.audio_key = kwargs.get('audio_key', 'audios')
+        self.video_key = kwargs.get('video_key', 'videos')
+
+        self._accelerator = kwargs.get('accelerator', 'cpu')
+        self.spec_numprocs = kwargs.get('spec_numprocs', 0)
+        self.cpu_required = kwargs.get('cpu_required', 1)
+        self.mem_required = kwargs.get('mem_required', 0)
+        if isinstance(self.mem_required, str):
+            self.mem_required = size_to_bytes(self.mem_required) / 1024**3
 
         from data_juicer.core.data import wrap_func_with_nested_access
         self.process = wrap_func_with_nested_access(self.process)
@@ -36,15 +40,36 @@ class OP:
     def process(self, *args, **kwargs):
         raise NotImplementedError
 
+    def remove_extra_parameters(self, param_dict, keys=None):
+        """
+            at the begining of the init of the mapper op, call
+            self.remove_extra_parameters(locals())
+            to get the init parameter dict of the op for convenience
+
+        """
+        if keys is None:
+            param_dict = {
+                k: v
+                for k, v in param_dict.items() if not k.startswith('_')
+            }
+            param_dict.pop('self', None)
+        else:
+            param_dict = {k: v for k, v in param_dict.items() if k not in keys}
+        return param_dict
+
+    def add_parameters(self, init_parameter_dict, **extra_param_dict):
+        """
+            add parameters for each sample, need to keep extra_param_dict
+            and init_parameter_dict unchanged.
+        """
+        related_parameters = copy.deepcopy(init_parameter_dict)
+        related_parameters.update(extra_param_dict)
+        return related_parameters
+
 
 class Mapper(OP):
 
-    def __init__(
-        self,
-        text_key: str = None,
-        image_key: str = None,
-        point_cloud_key: str = None,
-    ):
+    def __init__(self, *args, **kwargs):
         """
         Base class that conducts data editing.
 
@@ -52,8 +77,12 @@ class Mapper(OP):
             to be processed.
         :param image_key: the key name of field that stores sample image list
             to be processed
+        :param audio_key: the key name of field that stores sample audio list
+            to be processed
+        :param video_key: the key name of field that stores sample video list
+            to be processed
         """
-        super(Mapper, self).__init__(text_key, image_key, point_cloud_key)
+        super(Mapper, self).__init__(*args, **kwargs)
 
         # In default, it's a normal OP instead of batched OP
         self._batched_op = False
@@ -73,12 +102,7 @@ class Mapper(OP):
 
 class Filter(OP):
 
-    def __init__(
-        self,
-        text_key: str = None,
-        image_key: str = None,
-        point_cloud_key: str = None,
-    ):
+    def __init__(self, *args, **kwargs):
         """
         Base class that removes specific info.
 
@@ -86,8 +110,12 @@ class Filter(OP):
             to be processed
         :param image_key: the key name of field that stores sample image list
             to be processed
+        :param audio_key: the key name of field that stores sample audio list
+            to be processed
+        :param video_key: the key name of field that stores sample video list
+            to be processed
         """
-        super(Filter, self).__init__(text_key, image_key, point_cloud_key)
+        super(Filter, self).__init__(*args, **kwargs)
 
         from data_juicer.core.data import wrap_func_with_nested_access
         self.compute_stats = wrap_func_with_nested_access(self.compute_stats)
@@ -116,12 +144,7 @@ class Filter(OP):
 
 class Deduplicator(OP):
 
-    def __init__(
-        self,
-        text_key: str = None,
-        image_key: str = None,
-        point_cloud_key: str = None,
-    ):
+    def __init__(self, *args, **kwargs):
         """
         Base class that conducts deduplication.
 
@@ -129,8 +152,12 @@ class Deduplicator(OP):
             to be processed
         :param image_key: the key name of field that stores sample image list
             to be processed
+        :param audio_key: the key name of field that stores sample audio list
+            to be processed
+        :param video_key: the key name of field that stores sample video list
+            to be processed
         """
-        super(Deduplicator, self).__init__(text_key, image_key, point_cloud_key)
+        super(Deduplicator, self).__init__(*args, **kwargs)
 
         from data_juicer.core.data import wrap_func_with_nested_access
         self.compute_hash = wrap_func_with_nested_access(self.compute_hash)
@@ -158,12 +185,7 @@ class Deduplicator(OP):
 
 class Selector(OP):
 
-    def __init__(
-        self,
-        text_key: str = None,
-        image_key: str = None,
-        point_cloud_key: str = None,
-    ):
+    def __init__(self, *args, **kwargs):
         """
         Base class that conducts selection in dataset-level.
 
@@ -171,8 +193,12 @@ class Selector(OP):
             to be processed
         :param image_key: the key name of field that stores sample image list
             to be processed
+        :param audio_key: the key name of field that stores sample audio list
+            to be processed
+        :param video_key: the key name of field that stores sample video list
+            to be processed
         """
-        super(Selector, self).__init__(text_key, image_key, point_cloud_key)
+        super(Selector, self).__init__(*args, **kwargs)
 
     def process(self, dataset):
         """
@@ -180,63 +206,5 @@ class Selector(OP):
 
         :param dataset: input dataset
         :return: selected dataset.
-        """
-        raise NotImplementedError
-
-
-class Mycleanlab(OP):
-
-    def __init__(
-        self,
-        text_key: str = None,
-        image_key: str = None,
-        point_cloud_key: str = None,
-    ):
-        """
-        Base class that conducts selection in dataset-level.
-
-        :param text_key: the key name of field that stores sample texts
-            to be processed
-        :param image_key: the key name of field that stores sample image list
-            to be processed
-        """
-        super(Mycleanlab, self).__init__(text_key, image_key, point_cloud_key)
-
-    def process(self, dataset):
-        """
-        Dataset --> dataset.
-
-        :param dataset: input dataset
-        :return: selected dataset.
-        """
-        raise NotImplementedError
-
-class Generator(OP):
-
-    def __init__(
-        self,
-        text_key: str = None,
-        image_key: str = None,
-        point_cloud_key: str = None,
-    ):
-        """
-        Base class that conducts generation.
-        :param text_key: the key name of field that stores sample texts
-            to be processed
-        :param image_key: the key name of field that stores sample image list
-            to be processed
-        """
-        super(Generator, self).__init__(text_key, image_key, point_cloud_key)
-
-        from data_juicer.core.data import wrap_func_with_nested_access
-        self.process = wrap_func_with_nested_access(self.process)
-
-    
-    def process(self, dataset):
-        """
-        Dataset --> dataset.
-
-        :param dataset: input dataset
-        :return: dataset with generated contents.
         """
         raise NotImplementedError

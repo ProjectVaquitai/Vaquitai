@@ -1,5 +1,5 @@
 # Some code here has been modified from:
-# https://github.com/togethercomputer/RedPajama-Data/
+# https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/
 # --------------------------------------------------------
 
 import regex as re
@@ -7,7 +7,6 @@ import regex as re
 from ..base_op import OPERATORS, Mapper
 
 
-# TODO
 @OPERATORS.register_module('remove_header_mapper')
 class RemoveHeaderMapper(Mapper):
     """Mapper to remove headers at the beginning of documents in Latex
