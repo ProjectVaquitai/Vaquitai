@@ -100,11 +100,8 @@ class ImageDeduplicator(Deduplicator):
             # if show_num > 0 and hash in dup_hashes \
                     # and len(dup_pairs[hash]) < 2:
             if show_num > 0 and hash in dup_hashes:
-                print(len(dup_pairs[hash]))
-                
                 # tracer is open and not enough duplicate sample pairs
                 dup_pairs[hash].append(sample)
-                print(dup_pairs[hash])
             if hash in hashes:
                 return False
             else:

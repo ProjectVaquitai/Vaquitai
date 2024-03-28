@@ -228,6 +228,7 @@ class Executor:
                     tmp, dup_pairs = op.process(
                         dataset, self.tracer.show_num if self.open_tracer
                         and op_name in self.op_list_to_trace else 0)
+                    print(dup_pairs)
                     if self.open_tracer and op_name in self.op_list_to_trace:
                         self.tracer.trace_deduplicator(op_name, dup_pairs)
                 elif isinstance(op, Mycleanlab):   

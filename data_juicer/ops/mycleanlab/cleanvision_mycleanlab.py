@@ -43,8 +43,10 @@ class CleanvisionMycleanlab(Mycleanlab):
     #     return sample
 
     def save_results(self, sample):
+        print("hahaha")
+        print(sample)
         for issue in self.issues:
-            index = self.index_lookup.get(sample.get(self.image_key))
+            index = self.index_lookup.get(sample.get(self.image_key)[0])
             if index is not None:
                 sample[DEFAULT_PREFIX + issue] = self.res_df.iloc[[index]].get(issue).to_list()[0]
         return sample
@@ -55,7 +57,7 @@ class CleanvisionMycleanlab(Mycleanlab):
         chunk_size = 100000
         for j, image_pathxs in enumerate([image_paths[i : i + chunk_size] for i in range(0, len(image_paths), chunk_size)]):
             def worker(_):
-                return Image.open(_)
+                return Image.open(_[0])
             with ThreadPool(processes = num_proc) as pool:
                 image_keys = list(tqdm(pool.imap(worker, image_pathxs), total=len(image_pathxs), desc='Images Loading'))
                 pool.terminate()
@@ -66,11 +68,13 @@ class CleanvisionMycleanlab(Mycleanlab):
             imagelab.find_issues()
             hf_dataset_lst.append(tmp_dataset.remove_columns([self.image_key]))
             res_df_lst.append(imagelab.issues)
-            
+        # print(my_dict)
         self.hf_dataset = concatenate_datasets(hf_dataset_lst)
+        # print(self.hf_dataset['images_path'])
         self.res_df = pd.concat(res_df_lst)
         
-        self.index_lookup = {v: i for i, v in enumerate(self.hf_dataset[self.image_key + "_path"])}
+        self.index_lookup = {v[0]: i for i, v in enumerate(self.hf_dataset[self.image_key + "_path"])}
+        print(self.index_lookup)
         dataset = dataset.map(self.save_results)        
         return dataset
             

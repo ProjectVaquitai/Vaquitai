@@ -209,11 +209,15 @@ class Tracer:
 
         # reorganize the duplicate pairs
         dup_dict = []
-        for key in dup_pairs:
+        for i, key in enumerate(dup_pairs):
             dup_dict.append({
-                'dup1': dup_pairs[key][0],
-                'dup2': dup_pairs[key][1],
+                'dup_num': len(dup_pairs[key]) - 1,
+                'ori': dup_pairs[key][0],
             })
+            for j, item in enumerate(dup_pairs[key][1:]): 
+                print(j, item)
+                print(dup_dict[i])
+                dup_dict[i]['dup%d' % (j + 1)] = item
 
         # export the tracer result.
         res_name = f'duplicate-{op_name}.jsonl'
